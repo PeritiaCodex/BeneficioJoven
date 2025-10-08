@@ -179,10 +179,6 @@ fun LoginScreen(
 /* --- Estas pantallas se quedan como estaba tu prototipo simple --- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterScreen(onBack: () -> Unit) { SimpleInfo("Registro (prototipo)", onBack) }
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
 fun ForgotScreen(onBack: () -> Unit) { SimpleInfo("Recuperar contraseña (prototipo)", onBack) }
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -51,7 +51,7 @@ fun RegisterScreen(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(5.dp))
 
             // Logo OFFLINE desde drawable
             Image(
@@ -63,7 +63,7 @@ fun RegisterScreen(
                     .width(90.dp)
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             Text(
                 text = "BENEFICIO JOVEN",
@@ -73,7 +73,7 @@ fun RegisterScreen(
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // Contenedor
             Card(
@@ -90,10 +90,11 @@ fun RegisterScreen(
                         .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "Registro",
                         fontWeight = FontWeight.Bold,
-                        fontSize = 22.sp,
+                        fontSize = 20.sp,
                         color = Color.White
                     )
 
@@ -214,7 +215,7 @@ fun RegisterScreen(
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(top = 8.dp)
+                        modifier = Modifier.padding(top = 4.dp)
                     ) {
                         Checkbox(
                             checked = aceptoTerminos,
@@ -232,7 +233,7 @@ fun RegisterScreen(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     Button(
                         onClick = onRegister,

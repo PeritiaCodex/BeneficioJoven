@@ -5,13 +5,13 @@ import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import mx.itesm.beneficiojoven.ui.screens.RegisterScreen
 import mx.itesm.beneficiojoven.view.ui.screens.CouponDetailScreen
 import mx.itesm.beneficiojoven.view.ui.screens.FavoritesScreen
 import mx.itesm.beneficiojoven.view.ui.screens.ForgotScreen
 import mx.itesm.beneficiojoven.view.ui.screens.HomeScreen
 import mx.itesm.beneficiojoven.view.ui.screens.LoginScreen
 import mx.itesm.beneficiojoven.view.ui.screens.ProfileScreen
-import mx.itesm.beneficiojoven.view.ui.screens.RegisterScreen
 import mx.itesm.beneficiojoven.view.ui.screens.TermsScreen
 import mx.itesm.beneficiojoven.vm.AuthViewModel
 import mx.itesm.beneficiojoven.vm.CouponListVM
