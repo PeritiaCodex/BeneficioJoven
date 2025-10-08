@@ -1,4 +1,4 @@
-package mx.diz.asistenciaapp.ui.screens
+package mx.itesm.beneficiojoven.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -12,12 +12,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
-import androidx.compose.ui.text.input.PasswordVisualTransformation
+import mx.itesm.beneficiojoven.R
 
 @Composable
 fun RegisterScreen(
@@ -51,10 +53,10 @@ fun RegisterScreen(
         ) {
             Spacer(modifier = Modifier.height(30.dp))
 
-            // Logo
-            AsyncImage(
-                model = "https://i.imgur.com/qqhj9gz_d.webp?maxwidth=760&fidelity=grand", // URL del logo
-                contentDescription = "Logo de la empresa",
+            // Logo OFFLINE desde drawable
+            Image(
+                painter = painterResource(id = R.drawable.logo_sf),
+                contentDescription = "Logo Beneficio Joven",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .height(90.dp)
@@ -79,7 +81,7 @@ fun RegisterScreen(
                     .fillMaxWidth()
                     .padding(8.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color(0x8021212A)
+                    containerColor = Color(0x8021212A) // translúcido
                 ),
                 elevation = CardDefaults.cardElevation(8.dp)
             ) {
@@ -97,7 +99,7 @@ fun RegisterScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Campos de texto
+                    // --- Campos de texto ---
                     OutlinedTextField(
                         value = curp,
                         onValueChange = { curp = it },
@@ -218,8 +220,9 @@ fun RegisterScreen(
                             checked = aceptoTerminos,
                             onCheckedChange = { aceptoTerminos = it },
                             colors = CheckboxDefaults.colors(
-                                checkmarkColor = Color.White,
-                                uncheckedColor = Color.LightGray
+                                checkedColor = Color(0xFF4A90E2),
+                                uncheckedColor = Color.LightGray,
+                                checkmarkColor = Color.White
                             )
                         )
                         Text(
@@ -233,6 +236,7 @@ fun RegisterScreen(
 
                     Button(
                         onClick = onRegister,
+                        enabled = aceptoTerminos,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFF4A90E2)
                         ),
@@ -256,4 +260,10 @@ fun RegisterScreen(
             }
         }
     }
+}
+
+@Preview
+@Composable
+private fun RegisterScreenPreview() {
+    RegisterScreen()
 }
