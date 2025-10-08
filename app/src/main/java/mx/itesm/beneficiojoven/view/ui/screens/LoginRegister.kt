@@ -183,10 +183,6 @@ fun ForgotScreen(onBack: () -> Unit) { SimpleInfo("Recuperar contraseña (protot
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TermsScreen(onBack: () -> Unit) { SimpleInfo("Términos y condiciones (prototipo)", onBack) }
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
 private fun SimpleInfo(text: String, onBack: () -> Unit) {
     Scaffold(
         topBar = {

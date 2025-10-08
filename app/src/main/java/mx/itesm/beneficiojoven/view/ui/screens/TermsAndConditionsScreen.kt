@@ -1,4 +1,4 @@
-package mx.diz.beneficiojoven.ui
+package mx.itesm.beneficiojoven.view.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -17,7 +17,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 
 @Composable
-fun TermsAndConditionsScreen(onCloseClicked: () -> Unit = {}) {
+fun TermsScreen(
+    onBack: () -> Unit = {},
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -32,6 +34,14 @@ fun TermsAndConditionsScreen(onCloseClicked: () -> Unit = {}) {
                 .fillMaxSize()
                 .padding(24.dp)
         ) {
+            IconButton(onClick = { onBack() },
+                modifier = Modifier.align(Alignment.End)) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Cerrar",
+                    tint = Color.White
+                )
+            }
             // Encabezado con título y botón de cierre
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -42,16 +52,10 @@ fun TermsAndConditionsScreen(onCloseClicked: () -> Unit = {}) {
                     color = Color.White,
                     fontSize = 26.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f).padding(horizontal = 32.dp),
                 )
 
-                IconButton(onClick = { onCloseClicked() }) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "Cerrar",
-                        tint = Color.White
-                    )
-                }
+
             }
 
             Spacer(modifier = Modifier.height(16.dp))
