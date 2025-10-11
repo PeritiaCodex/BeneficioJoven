@@ -1,4 +1,4 @@
-package mx.itesm.beneficiojoven.ui.screens
+package mx.itesm.beneficiojoven.view.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

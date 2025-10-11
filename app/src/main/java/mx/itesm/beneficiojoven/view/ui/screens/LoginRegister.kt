@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.sp
 import mx.itesm.beneficiojoven.R
 import mx.itesm.beneficiojoven.vm.AuthViewModel
 
-
 @Composable
 fun LoginScreen(
     vm: AuthViewModel,
@@ -34,10 +33,10 @@ fun LoginScreen(
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var keepSession by remember { mutableStateOf(false) } // local, listo por si luego lo persistes
+    var keepSession by remember { mutableStateOf(false) }
 
-    // Si ya hay usuario, navega al Home
-    if (user != null) onLogged()
+    // Evita navegar múltiples veces en recomposición
+    LaunchedEffect(user) { if (user != null) onLogged() }
 
     Box(
         modifier = Modifier
@@ -50,13 +49,13 @@ fun LoginScreen(
         contentAlignment = Alignment.Center
     ) {
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
             modifier = Modifier
                 .padding(24.dp)
-                .fillMaxWidth()
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            // LOGO desde URL
+            // Logo OFFLINE
             Image(
                 painter = painterResource(id = R.drawable.logo_sf),
                 contentDescription = "Logo Beneficio Joven",
@@ -66,15 +65,10 @@ fun LoginScreen(
                     .padding(bottom = 8.dp)
             )
 
-            Text(
-                text = "BENEFICIO JOVEN",
-                color = Color.White,
-                fontSize = 22.sp
-            )
+            Text("BENEFICIO JOVEN", color = Color.White, fontSize = 22.sp)
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(Modifier.height(24.dp))
 
-            // Contenedor principal translúcido
             Card(
                 colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.15f)),
                 modifier = Modifier
@@ -86,8 +80,9 @@ fun LoginScreen(
                     modifier = Modifier.padding(24.dp)
                 ) {
                     Text("Login", color = Color.White, fontSize = 20.sp)
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(Modifier.height(16.dp))
 
+                    // --- CORREO con colores custom ---
                     OutlinedTextField(
                         value = email,
                         onValueChange = { email = it },
@@ -95,11 +90,23 @@ fun LoginScreen(
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                         singleLine = true,
                         enabled = !loading,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = TextFieldDefaults.colors(
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White,
+                            focusedPlaceholderColor = Color.LightGray,
+                            unfocusedPlaceholderColor = Color.LightGray,
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            cursorColor = Color.White,
+                            focusedIndicatorColor = Color.White,
+                            unfocusedIndicatorColor = Color.White.copy(alpha = 0.6f)
+                        )
                     )
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(Modifier.height(8.dp))
 
+                    // --- CONTRASEÑA con colores custom ---
                     OutlinedTextField(
                         value = password,
                         onValueChange = { password = it },
@@ -107,43 +114,58 @@ fun LoginScreen(
                         visualTransformation = PasswordVisualTransformation(),
                         singleLine = true,
                         enabled = !loading,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = TextFieldDefaults.colors(
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White,
+                            focusedPlaceholderColor = Color.LightGray,
+                            unfocusedPlaceholderColor = Color.LightGray,
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            cursorColor = Color.White,
+                            focusedIndicatorColor = Color.White,
+                            unfocusedIndicatorColor = Color.White.copy(alpha = 0.6f)
+                        )
                     )
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(Modifier.height(8.dp))
 
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
                         Checkbox(
                             checked = keepSession,
                             onCheckedChange = { keepSession = it },
-                            enabled = !loading
+                            enabled = !loading,
+                            colors = CheckboxDefaults.colors(
+                                checkedColor = Color(0xFF3B82F6),
+                                uncheckedColor = Color.LightGray,
+                                checkmarkColor = Color.White
+                            )
                         )
                         Text("Mantener la sesión iniciada", color = Color.White, fontSize = 14.sp)
                     }
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(Modifier.height(12.dp))
 
                     Button(
                         onClick = { vm.login(email, password) },
                         modifier = Modifier.fillMaxWidth(),
                         enabled = !loading,
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3B82F6))
-                    ) {
-                        Text(if (loading) "Entrando..." else "Login")
-                    }
+                    ) { Text(if (loading) "Entrando..." else "Login") }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(Modifier.height(8.dp))
 
                     Button(
                         onClick = onRegister,
                         modifier = Modifier.fillMaxWidth(),
                         enabled = !loading,
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6B7280))
-                    ) {
-                        Text("Registrarse")
-                    }
+                    ) { Text("Registrarse") }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(Modifier.height(8.dp))
 
                     TextButton(onClick = onForgot, enabled = !loading) {
                         Text("¿Olvidaste tu contraseña?", color = Color.White)
@@ -151,23 +173,18 @@ fun LoginScreen(
 
                     if (error != null) {
                         Spacer(Modifier.height(8.dp))
-                        Text(
-                            "Error: $error",
-                            color = MaterialTheme.colorScheme.error
-                        )
+                        Text("Error: $error", color = MaterialTheme.colorScheme.error)
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(Modifier.height(12.dp))
 
-            // Link a Términos
             TextButton(onClick = onTerms, enabled = !loading) {
                 Text("Términos y condiciones", color = Color.White)
             }
         }
 
-        // Indicador centrado opcional mientras carga
         if (loading) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(color = Color.White)
@@ -176,24 +193,30 @@ fun LoginScreen(
     }
 }
 
-/* --- Estas pantallas se quedan como estaba tu prototipo simple --- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ForgotScreen(onBack: () -> Unit) { SimpleInfo("Recuperar contraseña (prototipo)", onBack) }
+fun ForgotScreen(onBack: () -> Unit) {
+    SimpleInfo("Recuperar contraseña (prototipo)", onBack)
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SimpleInfo(text: String, onBack: () -> Unit) {
+private fun SimpleInfo(
+    text: String,
+    onBack: () -> Unit
+) {
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(text) },
-                navigationIcon = { TextButton(onClick = onBack) { Text("Atrás") } }
-            )
-        }
-    ) {
-        Box(Modifier.fillMaxSize().padding(it), contentAlignment = Alignment.Center) {
-            Text(text)
-        }
+        topBar =
+            {
+                TopAppBar(
+                    title = { Text(text) },
+                    navigationIcon = { TextButton(onClick = onBack) { Text("Atrás") } })
+            }) {
+        Box(
+            Modifier
+                .fillMaxSize()
+                .padding(it),
+            contentAlignment = Alignment.Center
+        ) { Text(text) }
     }
 }

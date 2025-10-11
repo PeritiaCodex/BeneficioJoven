@@ -68,6 +68,10 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-intents:3.7.0")
     androidTestImplementation("androidx.test:rules:1.7.0")
 
+
+    implementation("androidx.compose.material3:material3:<composeVersion>")
+    implementation("androidx.compose.material:material-icons-extended:<composeVersion>")
+
     val room = "2.6.1"
     implementation("androidx.room:room-runtime:$room")
     implementation("androidx.room:room-ktx:$room")
