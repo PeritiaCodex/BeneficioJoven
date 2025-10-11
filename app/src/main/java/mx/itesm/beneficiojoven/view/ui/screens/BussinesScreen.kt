@@ -25,9 +25,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import coil.compose.AsyncImage
+import androidx.compose.material.icons.filled.CreditCard
+
 
 // Representa la información de un cupón
-data class Bussyness(
+data class Bussiness(
     val title: String,
     val imageUrl: String,
     val description: String,
@@ -35,17 +37,17 @@ data class Bussyness(
 )
 
 @Composable
-fun BussynessScreen(onCouponClick: () -> Unit = {}) {
+fun BusinessesScreen(onCouponClick: () -> Unit = {}) {
     val coupons = remember {
         // ... tu lista de cupones se mantiene igual
         listOf(
-            Bussyness("Six Flags - México", "https://pbs.twimg.com/profile_images/1828141276136443904/NsSVaImy_400x400.jpg", "Ven a Six Flags y aprovecha este Octoberfest...", "Entretenimiento"),
-            Bussyness("Negocio A", "https://picsum.photos/200/200", "Descripción del cupón A", "Comida"),
-            Bussyness("Negocio B", "https://picsum.photos/201/200", "Descripción del cupón B", "Salud"),
-            Bussyness("Negocio C", "https://picsum.photos/202/200", "Descripción del cupón C", "Belleza"),
-            Bussyness("Negocio X", "https://picsum.photos/203/200", "Descripción del cupón X", "Educación"),
-            Bussyness("Negocio Y", "https://picsum.photos/204/200", "Descripción del cupón Y", "Moda y Accesorios"),
-            Bussyness("Negocio Z", "https://picsum.photos/205/200", "Descripción del cupón Z", "Servicios")
+            Bussiness("Six Flags - México", "https://pbs.twimg.com/profile_images/1828141276136443904/NsSVaImy_400x400.jpg", "Ven a Six Flags y aprovecha este Octoberfest...", "Entretenimiento"),
+            Bussiness("Negocio A", "https://picsum.photos/200/200", "Descripción del cupón A", "Comida"),
+            Bussiness("Negocio B", "https://picsum.photos/201/200", "Descripción del cupón B", "Salud"),
+            Bussiness("Negocio C", "https://picsum.photos/202/200", "Descripción del cupón C", "Belleza"),
+            Bussiness("Negocio X", "https://picsum.photos/203/200", "Descripción del cupón X", "Educación"),
+            Bussiness("Negocio Y", "https://picsum.photos/204/200", "Descripción del cupón Y", "Moda y Accesorios"),
+            Bussiness("Negocio Z", "https://picsum.photos/205/200", "Descripción del cupón Z", "Servicios")
         )
     }
 

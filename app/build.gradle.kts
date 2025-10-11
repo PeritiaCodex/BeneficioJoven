@@ -63,6 +63,7 @@ dependencies {
 
     // --- Preferencias (notificaciones, etc.) ---
     implementation("androidx.datastore:datastore-preferences:1.1.1")
+    implementation(libs.androidx.compose.foundation)
 
     // --- Test espresso
     androidTestImplementation("androidx.test.espresso:espresso-intents:3.7.0")
