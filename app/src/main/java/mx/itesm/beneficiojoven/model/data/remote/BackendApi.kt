@@ -2,14 +2,19 @@ package mx.itesm.beneficiojoven.model.data.remote
 
 import mx.itesm.beneficiojoven.model.data.remote.dto.AuthResponse
 import mx.itesm.beneficiojoven.model.data.remote.dto.CouponDto
+import mx.itesm.beneficiojoven.model.data.remote.dto.LoginReq
+import okhttp3.ResponseBody
 import retrofit2.http.*
+import retrofit2.Response
 
-// BackendApi.kt
+
 interface BackendApi {
     @POST("auth/login")
-    suspend fun login(@Body body: Map<String, String>): AuthResponse
+    suspend fun login(@Body body: LoginReq): Response<AuthResponse>
     @POST("auth/register")
-    suspend fun register(@Body body: Map<String, @JvmSuppressWildcards Any>): Map<String, Any>
+    suspend fun register(
+        @Body body: Map<String, @JvmSuppressWildcards Any>
+    ): Response<ResponseBody>
     @GET("coupons")
     suspend fun listCoupons(): List<CouponDto>
 

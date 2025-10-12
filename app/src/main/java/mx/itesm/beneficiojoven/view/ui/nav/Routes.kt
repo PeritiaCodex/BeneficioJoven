@@ -9,4 +9,7 @@ sealed class Screen(val route: String) {
     data object Favorites : Screen("favorites")
     data object Businesses : Screen("businesses")
     data object Coupons : Screen("coupons")
+    data object CouponsByMerchant : Screen("couponsFor/{merchant}") {
+        fun path(merchant: String) = "couponsFor/${java.net.URLEncoder.encode(merchant, "UTF-8")}"
+    }
 }

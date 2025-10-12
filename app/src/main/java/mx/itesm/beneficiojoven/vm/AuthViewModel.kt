@@ -45,4 +45,5 @@ class AuthViewModel(
             .onFailure { _error.value = it.message }
         _loading.value = false
     }
+
 }

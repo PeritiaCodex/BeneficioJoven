@@ -150,7 +150,7 @@ fun LoginScreen(
                     Spacer(Modifier.height(12.dp))
 
                     Button(
-                        onClick = { vm.login(email, password) },
+                        onClick = { vm.login(email.trim(), password) },
                         modifier = Modifier.fillMaxWidth(),
                         enabled = !loading,
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3B82F6))

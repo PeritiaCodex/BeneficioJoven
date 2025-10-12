@@ -27,8 +27,14 @@ object RetrofitClient {
 
     private val client = OkHttpClient.Builder()
         .addInterceptor(authInterceptor)
-        .addInterceptor(HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BASIC })
+        .addInterceptor(
+            HttpLoggingInterceptor().apply {
+                level = HttpLoggingInterceptor.Level.BODY  // antes: BASIC
+                redactHeader("Authorization")
+            }
+        )
         .build()
+
 
     val api: BackendApi by lazy {
         Retrofit.Builder()

@@ -78,6 +78,8 @@ dependencies {
     implementation("androidx.room:room-ktx:$room")
     kapt("androidx.room:room-compiler:$room")
 
+    implementation("io.coil-kt:coil-svg:2.6.0")
+
     // --- Tests (de tu catálogo) ---
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

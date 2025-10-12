@@ -46,12 +46,15 @@ fun AppNavHost(nav: NavHostController) {
 
         composable(Screen.Businesses.route) {
             BusinessesScreen(
-                onCouponClick = { nav.navigate(Screen.Coupons.route) }
+                vm = listVM,
+                onOpenMerchant = { merchant ->
+                    nav.navigate(Screen.CouponsByMerchant.path(merchant))
+                }
             )
         }
-
-        composable(Screen.Coupons.route) {
-            CouponScreen()
+        composable(Screen.CouponsByMerchant.route) { backStackEntry ->
+            val merchant = backStackEntry.arguments?.getString("merchant")?.let { java.net.URLDecoder.decode(it, "UTF-8") } ?: return@composable
+            CouponScreen(merchantName = merchant, vm = listVM, onBack = { nav.popBackStack() })
         }
 
         composable(Screen.Profile.route) { ProfileScreen(onBack = { nav.popBackStack() }) }

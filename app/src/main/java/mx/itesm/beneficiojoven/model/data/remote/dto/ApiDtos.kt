@@ -14,3 +14,5 @@ data class CouponDto(
     val merchant_logo: String?,
     val merchant_type: String?
 )
+
+data class LoginReq(val email: String, val password: String)
