@@ -33,6 +33,7 @@ import androidx.compose.ui.zIndex
 import coil.compose.AsyncImage
 import mx.itesm.beneficiojoven.vm.CouponListVM
 import mx.itesm.beneficiojoven.model.Coupon
+import mx.itesm.beneficiojoven.view.ui.rememberAppImageLoader
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -129,6 +130,8 @@ fun CouponScreen(
 // --- Tarjeta de cabecera del negocio (acepta logo nulo) ---
 @Composable
 fun MerchantHeaderCard(name: String, logoUrl: String?) {
+    val imageLoader = rememberAppImageLoader()
+
     var isSubscribed by remember { mutableStateOf(false) }
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -140,6 +143,7 @@ fun MerchantHeaderCard(name: String, logoUrl: String?) {
         ) {
             AsyncImage(
                 model = logoUrl ?: "https://picsum.photos/seed/${name.hashCode()}/120/120",
+                imageLoader = imageLoader,
                 contentDescription = "Logo de $name",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
@@ -170,6 +174,8 @@ fun MerchantHeaderCard(name: String, logoUrl: String?) {
 // --- Card de cupón usando el modelo de dominio ---
 @Composable
 fun CouponCard(coupon: Coupon, isExpanded: Boolean, onClick: () -> Unit) {
+    val imageLoader = rememberAppImageLoader()
+
     Card(
         shape = TicketShape(cornerRadius = 24f, notchRadius = 40f),
         modifier = Modifier
@@ -193,6 +199,7 @@ fun CouponCard(coupon: Coupon, isExpanded: Boolean, onClick: () -> Unit) {
                     ) {
                         AsyncImage(
                             model = coupon.merchant.logoUrl ?: "https://picsum.photos/seed/${coupon.merchant.name.hashCode()}/120/120",
+                            imageLoader = imageLoader,
                             contentDescription = "Logo de ${coupon.merchant.name}",
                             contentScale = ContentScale.Fit,
                             modifier = Modifier.size(80.dp)

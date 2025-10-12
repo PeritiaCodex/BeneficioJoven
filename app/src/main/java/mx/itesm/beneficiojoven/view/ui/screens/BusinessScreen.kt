@@ -221,6 +221,8 @@ fun BusinessCard(
     description: String,
     type: String
 ) {
+    val imageLoader = rememberAppImageLoader()
+
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f)),
         modifier = Modifier
@@ -234,7 +236,6 @@ fun BusinessCard(
                 .padding(12.dp),
             verticalAlignment = Alignment.Top
         ) {
-            val imageLoader = rememberAppImageLoader()
 
             AsyncImage(
                 model = imageUrl,
