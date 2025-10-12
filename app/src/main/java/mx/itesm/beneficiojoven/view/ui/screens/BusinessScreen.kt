@@ -27,7 +27,14 @@ import androidx.compose.material.icons.filled.CreditCard
 import mx.itesm.beneficiojoven.view.ui.rememberAppImageLoader
 import mx.itesm.beneficiojoven.vm.CouponListVM
 
-// Representa la tarjeta visual de un negocio (agrupado desde cupones)
+/**
+ * Modelo visual de un **negocio** para la grilla/lista de comercios.
+ *
+ * @property title Nombre visible del comercio.
+ * @property imageUrl URL de imagen/logo del comercio (puede ser SVG/PNG).
+ * @property description Texto descriptivo breve.
+ * @property type Tipo o categoría del comercio.
+ */
 data class Business(
     val title: String,
     val imageUrl: String,
@@ -35,6 +42,13 @@ data class Business(
     val type: String
 )
 
+/**
+ * Pantalla que muestra el **catálogo de negocios** agrupado a partir de la lista
+ * de cupones expuesta por [CouponListVM]. Incluye barra de filtros y menú inferior.
+ *
+ * @param vm ViewModel que provee estados de carga, error y la colección de cupones.
+ * @param onOpenMerchant Callback para navegar al listado de cupones de un comercio.
+ */
 @Composable
 fun BusinessesScreen(
     vm: CouponListVM,
@@ -44,10 +58,10 @@ fun BusinessesScreen(
     val error by vm.error.collectAsState()
     val allCoupons by vm.coupons.collectAsState()
 
-    // Carga inicial si hace falta
+    // Carga inicial si no hay datos y no se está cargando.
     LaunchedEffect(Unit) { if (allCoupons.isEmpty() && !loading) vm.refresh() }
 
-    // Agrupa por negocio y mapea a la tarjeta visual Business
+    // Agregación: cupones → negocios (primer cupón aporta logo/desc)
     val businesses: List<Business> = remember(allCoupons) {
         allCoupons
             .groupBy { it.merchant.name }
@@ -67,7 +81,7 @@ fun BusinessesScreen(
 
     GradientScreenLayout {
         Column(modifier = Modifier.fillMaxSize()) {
-            Header() // conserva tu encabezado
+            Header()
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -102,7 +116,7 @@ fun BusinessesScreen(
                     }
                 }
 
-                // Barra de filtros superpuesta (misma apariencia)
+                // Contenedor de filtros sobrepuesto
                 Column(modifier = Modifier.zIndex(1f)) {
                     FilterBar(
                         isExpanded = isFilterExpanded,
@@ -117,6 +131,9 @@ fun BusinessesScreen(
     }
 }
 
+/**
+ * Encabezado de la pantalla de negocios con título y acceso a **favoritos**.
+ */
 @Composable
 fun Header() {
     Row(
@@ -141,6 +158,12 @@ fun Header() {
     }
 }
 
+/**
+ * Barra compacta de **filtros** con opción para expandir panel avanzado.
+ *
+ * @param isExpanded Indica si el panel avanzado está desplegado.
+ * @param onToggle Acción para alternar el estado de expansión.
+ */
 @Composable
 fun FilterBar(isExpanded: Boolean, onToggle: () -> Unit) {
     Card(
@@ -169,6 +192,11 @@ fun FilterBar(isExpanded: Boolean, onToggle: () -> Unit) {
     }
 }
 
+/**
+ * Panel avanzado de **filtros** mostrado/oculto mediante animación.
+ *
+ * @param visible Controla la visibilidad del panel.
+ */
 @Composable
 fun ExpandedFiltersPanel(visible: Boolean) {
     val allFilters = listOf(
@@ -196,6 +224,13 @@ fun ExpandedFiltersPanel(visible: Boolean) {
     }
 }
 
+/**
+ * Chip de filtro simple.
+ *
+ * @param label Texto del filtro.
+ * @param onClick Acción al pulsar el chip.
+ * @param modifier Modificador de composición opcional.
+ */
 @Composable
 fun FilterChip(label: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Surface(
@@ -213,6 +248,15 @@ fun FilterChip(label: String, onClick: () -> Unit, modifier: Modifier = Modifier
     }
 }
 
+/**
+ * Tarjeta de **negocio** con imagen, título, tipo y descripción.
+ *
+ * @param title Nombre del negocio.
+ * @param imageUrl URL de la imagen/logo a mostrar.
+ * @param onClick Acción al pulsar la tarjeta (por ejemplo, abrir cupones del comercio).
+ * @param description Descripción corta del negocio.
+ * @param type Categoría o tipo del negocio.
+ */
 @Composable
 fun BusinessCard(
     title: String,
@@ -275,6 +319,9 @@ fun BusinessCard(
     }
 }
 
+/**
+ * Menú inferior con accesos rápidos a **Tarjeta**, **Cupones** y **Usuario**.
+ */
 @Composable
 fun BottomMenu() {
     Row(

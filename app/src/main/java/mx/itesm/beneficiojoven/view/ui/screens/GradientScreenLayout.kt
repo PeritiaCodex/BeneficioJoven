@@ -11,7 +11,15 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
-// "plantilla de pantalla" reutilizable
+/**
+ * Plantilla reutilizable de pantalla con **fondo degradado vertical**.
+ *
+ * Envuelve al [content] y le aplica un `padding` consistente ([contentPadding]).
+ *
+ * @param modifier Modificador opcional para el contenedor raíz.
+ * @param contentPadding Márgenes internos aplicados al contenido (por defecto `16.dp`).
+ * @param content Contenido específico de la pantalla.
+ */
 @Composable
 fun GradientScreenLayout(
     modifier: Modifier = Modifier,

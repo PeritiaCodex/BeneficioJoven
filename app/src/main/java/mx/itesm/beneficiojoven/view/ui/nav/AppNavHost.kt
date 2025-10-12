@@ -7,7 +7,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import mx.itesm.beneficiojoven.view.ui.screens.BusinessesScreen
 import mx.itesm.beneficiojoven.view.ui.screens.RegisterScreen
-import mx.itesm.beneficiojoven.view.ui.screens.CouponDetailScreen
 import mx.itesm.beneficiojoven.view.ui.screens.CouponScreen
 import mx.itesm.beneficiojoven.view.ui.screens.FavoritesScreen
 import mx.itesm.beneficiojoven.view.ui.screens.ForgotScreen
@@ -17,8 +16,24 @@ import mx.itesm.beneficiojoven.view.ui.screens.TermsScreen
 import mx.itesm.beneficiojoven.vm.AuthViewModel
 import mx.itesm.beneficiojoven.vm.CouponListVM
 
+/**
+ * Host principal de navegación basado en **Navigation Compose**.
+ *
+ * Define el grafo de pantallas de la app y las transiciones entre ellas:
+ *
+ * - **Login** → al autenticarse, navega a [Screen.Businesses].
+ * - **Register** → al registrarse, navega a [Screen.Businesses]; permite volver con *back*.
+ * - **Forgot** / **Terms** / **Profile** → pantallas secundarias con *back*.
+ * - **Businesses** → listado de negocios; desde aquí se navega a cupones por comercio.
+ * - **CouponsByMerchant** → lista de cupones de un comercio específico.
+ * - **Favorites** → lista de favoritos con acceso al detalle de cupón.
+ * - **CouponDetail** → detalle de un cupón por `id`.
+ *
+ * @param nav Controlador de navegación de nivel superior.
+ */
 @Composable
 fun AppNavHost(nav: NavHostController) {
+    // ViewModels de alcance del host (alternativamente podrían inyectarse por DI/Hilt)
     val authVM = remember { AuthViewModel() }
     val listVM = remember { CouponListVM() }
 
@@ -64,11 +79,6 @@ fun AppNavHost(nav: NavHostController) {
                 onBack = { nav.popBackStack() },
                 onOpenCoupon = { id -> nav.navigate(Screen.CouponDetail.path(id)) }
             )
-        }
-
-        composable(Screen.CouponDetail.route) { backStack ->
-            val id = backStack.arguments?.getString("id") ?: return@composable
-            CouponDetailScreen(id = id, onBack = { nav.popBackStack() })
         }
     }
 }

@@ -19,6 +19,19 @@ import androidx.compose.ui.unit.sp
 import mx.itesm.beneficiojoven.R
 import mx.itesm.beneficiojoven.vm.AuthViewModel
 
+/**
+ * Pantalla de **inicio de sesión** con estilo degradado y tarjeta translúcida.
+ *
+ * Gestiona el estado de entrada de **correo** y **contraseña**, permite marcar
+ * “mantener sesión iniciada”, y orquesta la navegación a **registro**, **recuperación**
+ * y **términos**. Cuando [vm.user] cambia a no nulo, invoca [onLogged].
+ *
+ * @param vm ViewModel de autenticación encargado de realizar el login.
+ * @param onLogged Callback para navegar a la pantalla principal tras autenticarse.
+ * @param onRegister Navegación a la pantalla de registro.
+ * @param onForgot Navegación a recuperación de contraseña.
+ * @param onTerms Navegación a términos y condiciones.
+ */
 @Composable
 fun LoginScreen(
     vm: AuthViewModel,
@@ -193,12 +206,25 @@ fun LoginScreen(
     }
 }
 
+/**
+ * Pantalla de **recuperación de contraseña** (prototipo).
+ *
+ * Encapsula un scaffold mínimo con título y botón de navegación atrás.
+ *
+ * @param onBack Acción de retorno a la pantalla previa.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ForgotScreen(onBack: () -> Unit) {
     SimpleInfo("Recuperar contraseña (prototipo)", onBack)
 }
 
+/**
+ * Utilidad de UI simple para mostrar una pantalla con **TopAppBar** y texto central.
+ *
+ * @param text Texto a mostrar como título y contenido.
+ * @param onBack Acción de navegación hacia atrás.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SimpleInfo(

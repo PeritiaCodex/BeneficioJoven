@@ -22,6 +22,20 @@ import androidx.compose.ui.unit.sp
 import mx.itesm.beneficiojoven.R
 import mx.itesm.beneficiojoven.vm.AuthViewModel
 
+/**
+ * Pantalla de **registro de usuario**.
+ *
+ * Presenta un formulario con validaciones básicas (correo, contraseña, CURP, municipio y nombre),
+ * aceptación de términos y, al confirmar, invoca [AuthViewModel.register]. Si el flujo concluye
+ * con éxito (es decir, [AuthViewModel.user] deja de ser `null`), se ejecuta [onRegistered].
+ *
+ * El diseño utiliza un fondo con degradado, tarjeta translúcida y contenido desplazable.
+ *
+ * @param vm ViewModel responsable de la autenticación/registro.
+ * @param onBack Acción para regresar a la pantalla previa.
+ * @param onRegistered Acción a ejecutar tras registrarse (y típicamente hacer *auto-login*).
+ * @see AuthViewModel.register
+ */
 @Composable
 fun RegisterScreen(
     vm: AuthViewModel,
@@ -310,6 +324,11 @@ fun RegisterScreen(
     }
 }
 
+/**
+ * *Preview* de la pantalla de registro.
+ *
+ * > Nota: está desactivado por depender de un [AuthViewModel].
+ */
 @Preview
 @Composable
 private fun RegisterScreenPreview() {

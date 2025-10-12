@@ -35,6 +35,19 @@ import mx.itesm.beneficiojoven.vm.CouponListVM
 import mx.itesm.beneficiojoven.model.Coupon
 import mx.itesm.beneficiojoven.view.ui.rememberAppImageLoader
 
+/**
+ * Pantalla que muestra los **cupones disponibles** para un comercio específico.
+ *
+ * Consume el estado expuesto por [CouponListVM], filtra por [merchantName] y
+ * despliega tarjetas con la información del cupón, incluyendo una sección
+ * expandible con **QR** y código.
+ *
+ * También muestra barra de filtros superpuesta y un botón “Atrás”.
+ *
+ * @param merchantName Nombre del comercio por el que se filtrará la lista.
+ * @param vm ViewModel que provee la colección completa de cupones y estados de carga/error.
+ * @param onBack Acción a ejecutar cuando el usuario decide volver.
+ */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CouponScreen(
@@ -127,7 +140,15 @@ fun CouponScreen(
     }
 }
 
-// --- Tarjeta de cabecera del negocio (acepta logo nulo) ---
+/**
+ * Cabecera fija del comercio actual.
+ *
+ * Muestra el **logo** (si existe; en caso contrario un placeholder) y el nombre
+ * del comercio. Incluye un **switch** para simular suscripción a notificaciones.
+ *
+ * @param name Nombre del comercio.
+ * @param logoUrl URL del logo (puede ser nulo).
+ */
 @Composable
 fun MerchantHeaderCard(name: String, logoUrl: String?) {
     val imageLoader = rememberAppImageLoader()
@@ -171,7 +192,16 @@ fun MerchantHeaderCard(name: String, logoUrl: String?) {
     }
 }
 
-// --- Card de cupón usando el modelo de dominio ---
+/**
+ * Tarjeta visual de un **cupón** con forma de boleto (Ticket).
+ *
+ * La parte superior muestra logo e información del cupón; al expandirla,
+ * se presentan el **QR** y el texto del código.
+ *
+ * @param coupon Modelo de dominio del cupón.
+ * @param isExpanded Controla si se muestra la sección expandida.
+ * @param onClick Acción al pulsar la tarjeta (usar para expandir/colapsar).
+ */
 @Composable
 fun CouponCard(coupon: Coupon, isExpanded: Boolean, onClick: () -> Unit) {
     val imageLoader = rememberAppImageLoader()
@@ -274,7 +304,9 @@ fun CouponCard(coupon: Coupon, isExpanded: Boolean, onClick: () -> Unit) {
     }
 }
 
-// --- Utilerías visuales (igual que tenías) ---
+/**
+ * Divisor vertical punteado usado dentro de la tarjeta tipo ticket.
+ */
 @Composable
 fun DottedVerticalDivider() {
     Canvas(modifier = Modifier
@@ -285,6 +317,9 @@ fun DottedVerticalDivider() {
     }
 }
 
+/**
+ * Divisor horizontal punteado usado en la sección expandible del cupón.
+ */
 @Composable
 fun DottedHorizontalDivider() {
     Canvas(modifier = Modifier
@@ -295,6 +330,13 @@ fun DottedHorizontalDivider() {
     }
 }
 
+/**
+ * Forma personalizada de **boleto (ticket)** con esquinas redondeadas
+ * y dos muescas circulares laterales.
+ *
+ * @param cornerRadius Radio de las esquinas.
+ * @param notchRadius Radio de cada muesca lateral.
+ */
 class TicketShape(private val cornerRadius: Float, private val notchRadius: Float) : Shape {
     override fun createOutline(size: Size, layoutDirection: LayoutDirection, density: Density): Outline {
         val path = Path().apply {
