@@ -6,10 +6,12 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.*
@@ -68,16 +70,36 @@ fun CouponScreen(
     GradientScreenLayout {
         Column(Modifier.fillMaxSize()) {
             // título dinámico
-            Row(
+            Spacer(Modifier.height(14.dp))
+            Box(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                contentAlignment = Alignment.Center
             ) {
-                Text(text = "Cupones Disponibles", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
-                TextButton(onClick = onBack) { Text("Atrás") }
+                IconButton(
+                    onClick = onBack,
+                    modifier = Modifier.align(Alignment.CenterStart)
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Atrás",
+                        tint = Color.White
+                    )
+                }
+                Text(
+                    text = "Cupones Disponibles",
+                    color = Color.White,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
-
-            Spacer(Modifier.height(16.dp))
+            if (merchantInfo != null) {
+                Spacer(Modifier.height(12.dp))
+                MerchantHeaderCard(
+                    name = merchantInfo.merchant.name,
+                    logoUrl = merchantInfo.merchant.logoUrl
+                )
+                Spacer(Modifier.height(16.dp))
+            }
 
             Box(Modifier.weight(1f)) {
                 when {
@@ -95,24 +117,10 @@ fun CouponScreen(
                         Text("No hay cupones para $merchantName", color = Color.White)
                     }
                     else -> LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .zIndex(0f),
+                        modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.spacedBy(24.dp),
-                        contentPadding = PaddingValues(top = 80.dp, bottom = 80.dp)
+                        contentPadding = PaddingValues(bottom = 80.dp) // sin top padding
                     ) {
-                        // Sticky header del negocio
-                        stickyHeader {
-                            merchantInfo?.let { c ->
-                                MerchantHeaderCard(
-                                    name = c.merchant.name,
-                                    logoUrl = c.merchant.logoUrl
-                                )
-                                Spacer(Modifier.height(24.dp))
-                            }
-                        }
-
-                        // Lista de cupones
                         items(coupons, key = { it.id }) { c ->
                             CouponCard(
                                 coupon = c,
@@ -123,15 +131,6 @@ fun CouponScreen(
                             )
                         }
                     }
-                }
-
-                // Barra de filtros superpuesta (visual igual)
-                Column(Modifier.zIndex(1f)) {
-                    FilterBar(
-                        isExpanded = isFilterExpanded,
-                        onToggle = { isFilterExpanded = !isFilterExpanded }
-                    )
-                    ExpandedFiltersPanel(visible = isFilterExpanded)
                 }
             }
 

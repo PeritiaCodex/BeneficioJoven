@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -136,9 +137,10 @@ fun BusinessesScreen(
  */
 @Composable
 fun Header() {
+    Spacer(Modifier.height(16.dp))
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
@@ -147,14 +149,6 @@ fun Header() {
             fontSize = 26.sp,
             fontWeight = FontWeight.Bold
         )
-        IconButton(onClick = { /* TODO: acción de favoritos */ }) {
-            Icon(
-                imageVector = Icons.Default.Favorite,
-                contentDescription = "Favoritos",
-                tint = Color.White,
-                modifier = Modifier.size(28.dp)
-            )
-        }
     }
 }
 
@@ -271,7 +265,7 @@ fun BusinessCard(
         colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f)),
         modifier = Modifier
             .fillMaxWidth()
-            .height(200.dp)
+            .height(140.dp)
             .clickable { onClick() }
     ) {
         Row(
@@ -335,8 +329,8 @@ fun BottomMenu() {
     ) {
         IconButton(onClick = { /* Tarjeta digital */ }) {
             Icon(
-                imageVector = Icons.Default.CreditCard,
-                contentDescription = "Tarjeta",
+                imageVector = Icons.Default.Favorite,
+                contentDescription = "Favoritos",
                 tint = Color.White,
                 modifier = Modifier.size(32.dp)
             )
