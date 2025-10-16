@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import mx.itesm.beneficiojoven.model.data.local.FavoritesRepository
 import mx.itesm.beneficiojoven.model.data.local.InMemoryDbProvider
 import mx.itesm.beneficiojoven.model.Coupon
+import mx.itesm.beneficiojoven.model.data.local.DatabaseProvider
 
 /**
  * ViewModel responsable de exponer y actualizar la lista de cupones **favoritos**.
@@ -24,7 +25,7 @@ import mx.itesm.beneficiojoven.model.Coupon
 class FavoritesVM(app: Application) : AndroidViewModel(app) {
 
     /** Repositorio local para gestionar favoritos. */
-    private val repo = FavoritesRepository(InMemoryDbProvider.get(app).couponDao())
+    private val repo = FavoritesRepository(DatabaseProvider.get(app).couponDao())
 
     /**
      * Flujo en vivo de cupones favoritos.
