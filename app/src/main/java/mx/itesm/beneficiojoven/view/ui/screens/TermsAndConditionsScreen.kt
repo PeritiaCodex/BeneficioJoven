@@ -25,7 +25,7 @@ import androidx.compose.material.icons.filled.Close
  * @param onBack Acción para cerrar la pantalla y volver a la anterior.
  */
 @Composable
-fun TermsScreen(
+fun TermsAndConditionsScreen(
     onBack: () -> Unit = {},
 ) {
     Box(

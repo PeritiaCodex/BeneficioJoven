@@ -2,6 +2,7 @@
 package mx.itesm.beneficiojoven.model.data.repository
 
 import mx.itesm.beneficiojoven.model.User
+import mx.itesm.beneficiojoven.model.UserProfile
 
 /**
  * Contrato de acceso a datos de la app.
@@ -17,7 +18,7 @@ interface AppRepository {
      * @param email Correo electrónico.
      * @param password Contraseña en texto plano.
      * @return [Result] que contiene el [User] autenticado en éxito; en fallo,
-     *         incluye el detalle del error (por ejemplo, mensaje del backend).
+     * incluye el detalle del error (por ejemplo, mensaje del backend).
      */
     suspend fun login(email: String, password: String): Result<User>
 
@@ -55,4 +56,11 @@ interface AppRepository {
      * @return [Result] con el cupón o un error si no se encontró.
      */
     suspend fun couponById(id: String): Result<mx.itesm.beneficiojoven.model.Coupon>
+
+    /**
+     * Obtiene el perfil del usuario actualmente autenticado.
+     *
+     * @return [Result] con el [UserProfile] o un error.
+     */
+    suspend fun getProfile(): Result<UserProfile>
 }

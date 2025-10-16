@@ -134,7 +134,9 @@ fun CouponScreen(
                 }
             }
 
-            BottomMenu()
+            BottomMenu(
+                onProfileClick = {}
+            )
         }
     }
 }

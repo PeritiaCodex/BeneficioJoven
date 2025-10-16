@@ -3,6 +3,7 @@ package mx.itesm.beneficiojoven.model.data.repository
 
 import mx.itesm.beneficiojoven.model.User
 import mx.itesm.beneficiojoven.model.Role
+import mx.itesm.beneficiojoven.model.UserProfile
 import mx.itesm.beneficiojoven.model.data.remote.RetrofitClient
 import mx.itesm.beneficiojoven.model.data.remote.Session
 import mx.itesm.beneficiojoven.model.data.remote.dto.LoginReq
@@ -121,5 +122,17 @@ class RemoteRepository : AppRepository {
     override suspend fun couponById(id: String) = runCatching {
         val list = api.listCoupons()
         list.first { it.coupon_id.toString() == id }.toDomain()
+    }
+
+    /**
+     * Obtiene el perfil del usuario desde el endpoint protegido y lo mapea al modelo de dominio.
+     */
+    override suspend fun getProfile(): Result<UserProfile> = runCatching {
+        val dto = api.getProfile()
+        UserProfile(
+            fullName = dto.full_name,
+            email = dto.email,
+            municipality = dto.municipality ?: "No especificado"
+        )
     }
 }
