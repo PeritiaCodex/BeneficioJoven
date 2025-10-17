@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -24,6 +25,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import coil.compose.AsyncImage
 import androidx.compose.material.icons.filled.CreditCard
+import mx.itesm.beneficiojoven.view.ui.components.LiquidGlassCard
+import mx.itesm.beneficiojoven.view.ui.components.LocalBackdropBrush
 import mx.itesm.beneficiojoven.view.ui.rememberAppImageLoader
 import mx.itesm.beneficiojoven.vm.CouponListVM
 
@@ -114,6 +117,7 @@ fun BusinessesScreen(
             }
 
             BottomMenu(onProfileClick = onProfileClick)
+            BottomMenu(onOpenFavorites = onOpenFavorites)
         }
     }
 }
@@ -226,13 +230,20 @@ fun BusinessCard(
     type: String
 ) {
     val imageLoader = rememberAppImageLoader()
+    val backdrop = LocalBackdropBrush.current   // del GradientScreenLayout
 
-    Card(
-        colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f)),
+    LiquidGlassCard(
         modifier = Modifier
             .fillMaxWidth()
-            .height(200.dp)
-            .clickable { onClick() }
+            .height(140.dp)
+            .clickable { onClick() },
+        shape = RoundedCornerShape(22.dp),
+        cornerRadius = 22.dp,
+        blurRadius = 18.dp,     // detalle del fondo más nítido
+        tintAlpha = 0.04f,      // velo súper ligero
+        backdropAlpha = 0.95f,  // deja pasar casi el fondo
+        borderAlpha = 0.22f,
+        highlightAlpha = 0.10f
     ) {
         Row(
             modifier = Modifier
@@ -280,7 +291,9 @@ fun BusinessCard(
 }
 
 @Composable
-fun BottomMenu(onProfileClick: () -> Unit) {
+fun BottomMenu(
+    onOpenFavorites: () -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -290,7 +303,7 @@ fun BottomMenu(onProfileClick: () -> Unit) {
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = { /* Tarjeta digital */ }) {
+        IconButton(onClick = { onOpenFavorites() }) {
             Icon(
                 imageVector = Icons.Default.CreditCard,
                 contentDescription = "Tarjeta",

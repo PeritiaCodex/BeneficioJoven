@@ -36,6 +36,10 @@ import coil.compose.AsyncImage
 import mx.itesm.beneficiojoven.vm.CouponListVM
 import mx.itesm.beneficiojoven.model.Coupon
 import mx.itesm.beneficiojoven.view.ui.rememberAppImageLoader
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.lifecycle.viewmodel.compose.viewModel
+import mx.itesm.beneficiojoven.vm.FavoritesVM
+
 
 /**
  * Pantalla que muestra los **cupones disponibles** para un comercio específico.
@@ -55,7 +59,9 @@ import mx.itesm.beneficiojoven.view.ui.rememberAppImageLoader
 fun CouponScreen(
     merchantName: String,
     vm: CouponListVM,
-    onBack: () -> Unit = {}
+    favoritesVM: FavoritesVM = viewModel(),
+    onBack: () -> Unit = {},
+    onOpenFavorites: () -> Unit = {}
 ) {
     val loading by vm.loading.collectAsState()
     val error by vm.error.collectAsState()
@@ -122,11 +128,18 @@ fun CouponScreen(
                         contentPadding = PaddingValues(bottom = 80.dp) // sin top padding
                     ) {
                         items(coupons, key = { it.id }) { c ->
+
+                            val isFavorite by favoritesVM.repo().isFavoriteFlow(c.id).collectAsState(initial = false)
+
                             CouponCard(
                                 coupon = c,
                                 isExpanded = (expandedCouponId == c.id),
+                                isFavorite = isFavorite, // <-- PASA EL ESTADO
                                 onClick = {
                                     expandedCouponId = if (expandedCouponId == c.id) null else c.id
+                                },
+                                onToggleFavorite = { // <-- PASA LA ACCIÓN
+                                    favoritesVM.toggle(c, !isFavorite)
                                 }
                             )
                         }
@@ -137,6 +150,7 @@ fun CouponScreen(
             BottomMenu(
                 onProfileClick = {}
             )
+            BottomMenu(onOpenFavorites = onOpenFavorites)
         }
     }
 }
@@ -204,7 +218,13 @@ fun MerchantHeaderCard(name: String, logoUrl: String?) {
  * @param onClick Acción al pulsar la tarjeta (usar para expandir/colapsar).
  */
 @Composable
-fun CouponCard(coupon: Coupon, isExpanded: Boolean, onClick: () -> Unit) {
+fun CouponCard(
+    coupon: Coupon,
+    isExpanded: Boolean,
+    isFavorite: Boolean,
+    onClick: () -> Unit,
+    onToggleFavorite: () -> Unit
+) {
     val imageLoader = rememberAppImageLoader()
 
     Card(
@@ -268,12 +288,17 @@ fun CouponCard(coupon: Coupon, isExpanded: Boolean, onClick: () -> Unit) {
 
                 // Botón Guardar (favoritos)
                 IconButton(
-                    onClick = { /* TODO: guardar cupón */ },
+                    onClick = onToggleFavorite, // <-- Llama a la acción del ViewModel
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(4.dp)
                 ) {
-                    Icon(imageVector = Icons.Default.BookmarkBorder, contentDescription = "Guardar Cupón", tint = Color.Gray)
+                    Icon(
+                        // Cambia el ícono y el color según el estado
+                        imageVector = if (isFavorite) Icons.Filled.Bookmark else Icons.Default.BookmarkBorder,
+                        contentDescription = if (isFavorite) "Quitar de Favoritos" else "Guardar Cupón",
+                        tint = if (isFavorite) Color(0xFF3B82F6) else Color.Gray
+                    )
                 }
             }
 

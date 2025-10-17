@@ -76,7 +76,8 @@ data class Coupon(
     val discountText: String,          // “15% OFF”, “$100 MXN”
     val merchant: Merchant,
     val validUntil: String?,           // simplificado
-    val qrUrl: String?                 // para “ver QR” más adelante
+    val qrUrl: String?,                 // para “ver QR” más adelante
+    val isFavorite: Boolean? = false    // agregado
 ) : Parcelable
 
 /**
