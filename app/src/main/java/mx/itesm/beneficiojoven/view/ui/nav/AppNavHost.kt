@@ -64,7 +64,8 @@ fun AppNavHost(nav: NavHostController) {
                 vm = listVM,
                 onOpenMerchant = { merchant ->
                     nav.navigate(Screen.CouponsByMerchant.path(merchant))
-                }
+                },
+                onOpenFavorites = { nav.navigate(Screen.Favorites.route) }
             )
         }
         composable(Screen.CouponsByMerchant.route) { backStackEntry ->
@@ -77,7 +78,8 @@ fun AppNavHost(nav: NavHostController) {
         composable(Screen.Favorites.route) {
             FavoritesScreen(
                 onBack = { nav.popBackStack() },
-                onOpenCoupon = { id -> nav.navigate(Screen.CouponDetail.path(id)) }
+                onOpenCoupon = { id -> nav.navigate(Screen.CouponDetail.path(id)) },
+                onOpenFavorites = {  }
             )
         }
     }

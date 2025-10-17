@@ -60,7 +60,8 @@ fun CouponScreen(
     merchantName: String,
     vm: CouponListVM,
     favoritesVM: FavoritesVM = viewModel(),
-    onBack: () -> Unit = {}
+    onBack: () -> Unit = {},
+    onOpenFavorites: () -> Unit = {}
 ) {
     val loading by vm.loading.collectAsState()
     val error by vm.error.collectAsState()
@@ -146,7 +147,7 @@ fun CouponScreen(
                 }
             }
 
-            BottomMenu()
+            BottomMenu(onOpenFavorites = onOpenFavorites)
         }
     }
 }

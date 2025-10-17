@@ -56,7 +56,8 @@ data class Business(
 @Composable
 fun BusinessesScreen(
     vm: CouponListVM,
-    onOpenMerchant: (merchantName: String) -> Unit
+    onOpenMerchant: (merchantName: String) -> Unit,
+    onOpenFavorites: () -> Unit
 ) {
     val loading by vm.loading.collectAsState()
     val error by vm.error.collectAsState()
@@ -130,7 +131,7 @@ fun BusinessesScreen(
                 }
             }
 
-            BottomMenu()
+            BottomMenu(onOpenFavorites = onOpenFavorites)
         }
     }
 }
@@ -274,7 +275,7 @@ fun BusinessCard(
         cornerRadius = 22.dp,
         blurRadius = 18.dp,     // detalle del fondo más nítido
         tintAlpha = 0.04f,      // velo súper ligero
-        backdropAlpha = 0.95f,  // deja pasar casi todo el fondo
+        backdropAlpha = 0.95f,  // deja pasar casi el fondo
         borderAlpha = 0.22f,
         highlightAlpha = 0.10f
     ) {
@@ -327,7 +328,9 @@ fun BusinessCard(
  * Menú inferior con accesos rápidos a **Tarjeta**, **Cupones** y **Usuario**.
  */
 @Composable
-fun BottomMenu() {
+fun BottomMenu(
+    onOpenFavorites: () -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -337,7 +340,7 @@ fun BottomMenu() {
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = { /* Tarjeta digital */ }) {
+        IconButton(onClick = { onOpenFavorites() }) {
             Icon(
                 imageVector = Icons.Default.Favorite,
                 contentDescription = "Favoritos",
