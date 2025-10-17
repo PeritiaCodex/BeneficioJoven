@@ -148,7 +148,7 @@ fun Header() {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "Catálogo de Negocios:",
+            text = "Catálogo de Negocios",
             color = Color.White,
             fontSize = 26.sp,
             fontWeight = FontWeight.Bold
@@ -165,7 +165,7 @@ fun Header() {
 @Composable
 fun FilterBar(isExpanded: Boolean, onToggle: () -> Unit) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color.DarkGray.copy(alpha = 0.75f)),
+        colors = CardDefaults.cardColors(containerColor = Color.Gray.copy(alpha = 0.65f)),
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(

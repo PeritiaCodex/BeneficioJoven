@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
 import coil.compose.AsyncImage
 import mx.itesm.beneficiojoven.vm.CouponListVM
 import mx.itesm.beneficiojoven.model.Coupon
@@ -186,11 +185,14 @@ fun MerchantHeaderCard(name: String, logoUrl: String?) {
             )
             Spacer(Modifier.width(16.dp))
             Column(Modifier.weight(1f)) {
-                Text("Cupones de:", color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp)
+                Text("Cupones de:",
+                    color = Color.White.copy(alpha = 0.8f),
+                    fontSize = 12.sp)
                 Text(name, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
             }
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(imageVector = Icons.Default.Notifications, contentDescription = "Suscripción", tint = Color.White)
+                Icon(imageVector = Icons.Default.Notifications,
+                    contentDescription = "Suscripción", tint = Color.White)
                 Switch(
                     checked = isSubscribed,
                     onCheckedChange = { isSubscribed = it },
@@ -336,7 +338,10 @@ fun DottedVerticalDivider() {
         .fillMaxHeight()
         .width(1.dp)) {
         val pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
-        drawLine(color = Color.LightGray, start = Offset(0f, 0f), end = Offset(0f, size.height), strokeWidth = 2f, pathEffect = pathEffect)
+        drawLine(color = Color.LightGray,
+            start = Offset(0f, 0f),
+            end = Offset(0f, size.height),
+            strokeWidth = 2f, pathEffect = pathEffect)
     }
 }
 
@@ -349,7 +354,10 @@ fun DottedHorizontalDivider() {
         .fillMaxWidth()
         .height(1.dp)) {
         val pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
-        drawLine(color = Color.LightGray, start = Offset(0f, 0f), end = Offset(size.width, 0f), strokeWidth = 2f, pathEffect = pathEffect)
+        drawLine(color = Color.LightGray,
+            start = Offset(0f, 0f),
+            end = Offset(size.width, 0f),
+            strokeWidth = 2f, pathEffect = pathEffect)
     }
 }
 
@@ -364,7 +372,8 @@ class TicketShape(private val cornerRadius: Float, private val notchRadius: Floa
     override fun createOutline(size: Size, layoutDirection: LayoutDirection, density: Density): Outline {
         val path = Path().apply {
             fillType = PathFillType.EvenOdd
-            addRoundRect(RoundRect(Rect(Offset.Zero, size), CornerRadius(cornerRadius)))
+            addRoundRect(RoundRect(Rect(Offset.Zero, size),
+                CornerRadius(cornerRadius)))
             val leftNotchRect = Rect(
                 left = -notchRadius,
                 top = size.height / 2 - notchRadius,
