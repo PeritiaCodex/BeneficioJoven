@@ -20,6 +20,17 @@ data class User(
 ) : Parcelable
 
 /**
+ * Modelo de dominio para los datos del perfil de usuario que se mostrarán en la UI.
+ */
+@Parcelize
+data class UserProfile(
+    val fullName: String,
+    val email: String,
+    val municipality: String,
+    val profileImageUrl: String? = null // Reservado para el futuro
+) : Parcelable
+
+/**
  * Roles disponibles para control de capacidades de la app.
  *
  * - [USER] Usuario final.

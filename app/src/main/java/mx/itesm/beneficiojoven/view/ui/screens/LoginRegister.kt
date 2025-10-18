@@ -1,8 +1,10 @@
 package mx.itesm.beneficiojoven.view.ui.screens
 
+import android.app.Application
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -11,33 +13,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import mx.itesm.beneficiojoven.R
 import mx.itesm.beneficiojoven.vm.AuthViewModel
+import mx.itesm.beneficiojoven.vm.AuthViewModelFactory
 
-/**
- * Pantalla de **inicio de sesión** con estilo degradado y tarjeta translúcida.
- *
- * Gestiona el estado de entrada de **correo** y **contraseña**, permite marcar
- * “mantener sesión iniciada”, y orquesta la navegación a **registro**, **recuperación**
- * y **términos**. Cuando [vm.user] cambia a no nulo, invoca [onLogged].
- *
- * @param vm ViewModel de autenticación encargado de realizar el login.
- * @param onLogged Callback para navegar a la pantalla principal tras autenticarse.
- * @param onRegister Navegación a la pantalla de registro.
- * @param onForgot Navegación a recuperación de contraseña.
- * @param onTerms Navegación a términos y condiciones.
- */
 @Composable
 fun LoginScreen(
-    vm: AuthViewModel,
+    vm: AuthViewModel = viewModel(factory = AuthViewModelFactory(LocalContext.current.applicationContext as Application)),
     onLogged: () -> Unit,
     onRegister: () -> Unit,
-    onForgot: () -> Unit,
     onTerms: () -> Unit
 ) {
     val loading by vm.loading.collectAsState()
@@ -48,7 +42,6 @@ fun LoginScreen(
     var password by remember { mutableStateOf("") }
     var keepSession by remember { mutableStateOf(false) }
 
-    // Evita navegar múltiples veces en recomposición
     LaunchedEffect(user) { if (user != null) onLogged() }
 
     Box(
@@ -68,7 +61,6 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Logo OFFLINE
             Image(
                 painter = painterResource(id = R.drawable.logo_sf),
                 contentDescription = "Logo Beneficio Joven",
@@ -95,7 +87,6 @@ fun LoginScreen(
                     Text("Login", color = Color.White, fontSize = 20.sp)
                     Spacer(Modifier.height(16.dp))
 
-                    // --- CORREO con colores custom ---
                     OutlinedTextField(
                         value = email,
                         onValueChange = { email = it },
@@ -119,7 +110,6 @@ fun LoginScreen(
 
                     Spacer(Modifier.height(8.dp))
 
-                    // --- CONTRASEÑA con colores custom ---
                     OutlinedTextField(
                         value = password,
                         onValueChange = { password = it },
@@ -180,9 +170,10 @@ fun LoginScreen(
 
                     Spacer(Modifier.height(8.dp))
 
-                    TextButton(onClick = onForgot, enabled = !loading) {
-                        Text("¿Olvidaste tu contraseña?", color = Color.White)
-                    }
+                    // No hay pantalla de "Olvidaste contraseña" en el nav graph actual
+                    // TextButton(onClick = onForgot, enabled = !loading) {
+                    //     Text("¿Olvidaste tu contraseña?", color = Color.White)
+                    // }
 
                     if (error != null) {
                         Spacer(Modifier.height(8.dp))
@@ -192,10 +183,14 @@ fun LoginScreen(
             }
 
             Spacer(Modifier.height(12.dp))
-
-            TextButton(onClick = onTerms, enabled = !loading) {
-                Text("Términos y condiciones", color = Color.White)
-            }
+            ClickableText(
+                text = AnnotatedString("Términos y condiciones"),
+                onClick = { onTerms() },
+                style = TextStyle(
+                    color = Color.White,
+                    textDecoration = TextDecoration.Underline
+                )
+            )
         }
 
         if (loading) {
@@ -203,46 +198,5 @@ fun LoginScreen(
                 CircularProgressIndicator(color = Color.White)
             }
         }
-    }
-}
-
-/**
- * Pantalla de **recuperación de contraseña** (prototipo).
- *
- * Encapsula un scaffold mínimo con título y botón de navegación atrás.
- *
- * @param onBack Acción de retorno a la pantalla previa.
- */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ForgotScreen(onBack: () -> Unit) {
-    SimpleInfo("Recuperar contraseña (prototipo)", onBack)
-}
-
-/**
- * Utilidad de UI simple para mostrar una pantalla con **TopAppBar** y texto central.
- *
- * @param text Texto a mostrar como título y contenido.
- * @param onBack Acción de navegación hacia atrás.
- */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun SimpleInfo(
-    text: String,
-    onBack: () -> Unit
-) {
-    Scaffold(
-        topBar =
-            {
-                TopAppBar(
-                    title = { Text(text) },
-                    navigationIcon = { TextButton(onClick = onBack) { Text("Atrás") } })
-            }) {
-        Box(
-            Modifier
-                .fillMaxSize()
-                .padding(it),
-            contentAlignment = Alignment.Center
-        ) { Text(text) }
     }
 }

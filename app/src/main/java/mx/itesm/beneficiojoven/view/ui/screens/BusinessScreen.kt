@@ -4,7 +4,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -33,11 +32,6 @@ import mx.itesm.beneficiojoven.vm.CouponListVM
 
 /**
  * Modelo visual de un **negocio** para la grilla/lista de comercios.
- *
- * @property title Nombre visible del comercio.
- * @property imageUrl URL de imagen/logo del comercio (puede ser SVG/PNG).
- * @property description Texto descriptivo breve.
- * @property type Tipo o categoría del comercio.
  */
 data class Business(
     val title: String,
@@ -46,27 +40,19 @@ data class Business(
     val type: String
 )
 
-/**
- * Pantalla que muestra el **catálogo de negocios** agrupado a partir de la lista
- * de cupones expuesta por [CouponListVM]. Incluye barra de filtros y menú inferior.
- *
- * @param vm ViewModel que provee estados de carga, error y la colección de cupones.
- * @param onOpenMerchant Callback para navegar al listado de cupones de un comercio.
- */
 @Composable
 fun BusinessesScreen(
     vm: CouponListVM,
     onOpenMerchant: (merchantName: String) -> Unit,
-    onOpenFavorites: () -> Unit
+    onProfileClick: () -> Unit,
+    onFavoritesClick: () -> Unit
 ) {
     val loading by vm.loading.collectAsState()
     val error by vm.error.collectAsState()
     val allCoupons by vm.coupons.collectAsState()
 
-    // Carga inicial si no hay datos y no se está cargando.
     LaunchedEffect(Unit) { if (allCoupons.isEmpty() && !loading) vm.refresh() }
 
-    // Agregación: cupones → negocios (primer cupón aporta logo/desc)
     val businesses: List<Business> = remember(allCoupons) {
         allCoupons
             .groupBy { it.merchant.name }
@@ -86,14 +72,14 @@ fun BusinessesScreen(
 
     GradientScreenLayout {
         Column(modifier = Modifier.fillMaxSize()) {
-            Header()
+            Header(onFavoritesClick)
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Box(modifier = Modifier.weight(1f)) {
                 when {
                     loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator()
+                        CircularProgressIndicator(color = Color.White)
                     }
                     error != null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -121,7 +107,6 @@ fun BusinessesScreen(
                     }
                 }
 
-                // Contenedor de filtros sobrepuesto
                 Column(modifier = Modifier.zIndex(1f)) {
                     FilterBar(
                         isExpanded = isFilterExpanded,
@@ -131,20 +116,17 @@ fun BusinessesScreen(
                 }
             }
 
+            BottomMenu(onProfileClick = onProfileClick)
             BottomMenu(onOpenFavorites = onOpenFavorites)
         }
     }
 }
 
-/**
- * Encabezado de la pantalla de negocios con título y acceso a **favoritos**.
- */
 @Composable
-fun Header() {
-    Spacer(Modifier.height(16.dp))
+fun Header(onFavoritesClick: () -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center,
+        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
@@ -153,14 +135,19 @@ fun Header() {
             fontSize = 26.sp,
             fontWeight = FontWeight.Bold
         )
+        IconButton(onClick = onFavoritesClick) {
+            Icon(
+                imageVector = Icons.Default.Favorite,
+                contentDescription = "Favoritos",
+                tint = Color.White,
+                modifier = Modifier.size(28.dp)
+            )
+        }
     }
 }
 
 /**
  * Barra compacta de **filtros** con opción para expandir panel avanzado.
- *
- * @param isExpanded Indica si el panel avanzado está desplegado.
- * @param onToggle Acción para alternar el estado de expansión.
  */
 @Composable
 fun FilterBar(isExpanded: Boolean, onToggle: () -> Unit) {
@@ -190,11 +177,6 @@ fun FilterBar(isExpanded: Boolean, onToggle: () -> Unit) {
     }
 }
 
-/**
- * Panel avanzado de **filtros** mostrado/oculto mediante animación.
- *
- * @param visible Controla la visibilidad del panel.
- */
 @Composable
 fun ExpandedFiltersPanel(visible: Boolean) {
     val allFilters = listOf(
@@ -222,13 +204,6 @@ fun ExpandedFiltersPanel(visible: Boolean) {
     }
 }
 
-/**
- * Chip de filtro simple.
- *
- * @param label Texto del filtro.
- * @param onClick Acción al pulsar el chip.
- * @param modifier Modificador de composición opcional.
- */
 @Composable
 fun FilterChip(label: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Surface(
@@ -246,15 +221,6 @@ fun FilterChip(label: String, onClick: () -> Unit, modifier: Modifier = Modifier
     }
 }
 
-/**
- * Tarjeta de **negocio** con imagen, título, tipo y descripción.
- *
- * @param title Nombre del negocio.
- * @param imageUrl URL de la imagen/logo a mostrar.
- * @param onClick Acción al pulsar la tarjeta (por ejemplo, abrir cupones del comercio).
- * @param description Descripción corta del negocio.
- * @param type Categoría o tipo del negocio.
- */
 @Composable
 fun BusinessCard(
     title: String,
@@ -324,9 +290,6 @@ fun BusinessCard(
     }
 }
 
-/**
- * Menú inferior con accesos rápidos a **Tarjeta**, **Cupones** y **Usuario**.
- */
 @Composable
 fun BottomMenu(
     onOpenFavorites: () -> Unit
@@ -342,8 +305,8 @@ fun BottomMenu(
     ) {
         IconButton(onClick = { onOpenFavorites() }) {
             Icon(
-                imageVector = Icons.Default.Favorite,
-                contentDescription = "Favoritos",
+                imageVector = Icons.Default.CreditCard,
+                contentDescription = "Tarjeta",
                 tint = Color.White,
                 modifier = Modifier.size(32.dp)
             )
@@ -356,7 +319,7 @@ fun BottomMenu(
                 modifier = Modifier.size(32.dp)
             )
         }
-        IconButton(onClick = { /* Usuario */ }) {
+        IconButton(onClick = onProfileClick) {
             Icon(
                 imageVector = Icons.Default.AccountCircle,
                 contentDescription = "Usuario",

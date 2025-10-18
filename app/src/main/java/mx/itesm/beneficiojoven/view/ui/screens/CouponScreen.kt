@@ -146,6 +146,9 @@ fun CouponScreen(
                 }
             }
 
+            BottomMenu(
+                onProfileClick = {}
+            )
             BottomMenu(onOpenFavorites = onOpenFavorites)
         }
     }

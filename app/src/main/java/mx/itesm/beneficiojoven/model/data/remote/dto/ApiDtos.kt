@@ -38,3 +38,14 @@ data class CouponDto(
  * @property password Contraseña en texto plano.
  */
 data class LoginReq(val email: String, val password: String)
+
+/**
+ * DTO para la respuesta del perfil de usuario desde el endpoint `GET /users/profile`.
+ * Mapea la estructura JSON que envía el backend.
+ */
+data class UserProfileDto(
+    val id: Int,
+    val email: String,
+    val full_name: String,
+    val municipality: String?
+)

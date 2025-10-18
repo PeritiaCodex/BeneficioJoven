@@ -3,6 +3,7 @@ package mx.itesm.beneficiojoven.model.data.remote
 import mx.itesm.beneficiojoven.model.data.remote.dto.AuthResponse
 import mx.itesm.beneficiojoven.model.data.remote.dto.CouponDto
 import mx.itesm.beneficiojoven.model.data.remote.dto.LoginReq
+import mx.itesm.beneficiojoven.model.data.remote.dto.UserProfileDto
 import okhttp3.ResponseBody
 import retrofit2.http.*
 import retrofit2.Response
@@ -72,4 +73,12 @@ interface BackendApi {
      */
     @POST("coupons/redeem")
     suspend fun redeem(@Body body: Map<String, Any>): Map<String, Any>
+
+    /**
+     * Obtiene el perfil del usuario autenticado.
+     * Esta ruta está protegida y requiere un token JWT válido.
+     * @return [UserProfileDto] con los datos del perfil.
+     */
+    @GET("users/profile/me")
+    suspend fun getProfile(): UserProfileDto
 }
