@@ -3,7 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("kotlin-parcelize") // ← para @Parcelize en los modelos
-    id("kotlin-kapt") // ← para el compilador de Room
+    id("kotlin-kapt")
+    alias(libs.plugins.google.gms.google.services) // ← para el compilador de Room
 }
 
 android {
@@ -65,6 +66,7 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.1.1")
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.benchmark.traceprocessor)
+    implementation(libs.firebase.messaging)
 
     // --- Test espresso
     androidTestImplementation("androidx.test.espresso:espresso-intents:3.7.0")

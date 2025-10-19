@@ -1,9 +1,20 @@
 package mx.itesm.beneficiojoven.view
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.navigation.compose.rememberNavController
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
 import mx.itesm.beneficiojoven.view.ui.nav.AppNavHost
 import mx.itesm.beneficiojoven.view.ui.theme.BeneficioJovenTheme
 
@@ -48,6 +59,10 @@ class MainActivity : ComponentActivity() {
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        solicitarPermiso()
+        obtenerToken()
+
         setContent {
             BeneficioJovenTheme {
                 val nav = rememberNavController()
@@ -55,4 +70,45 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+
+private fun solicitarPermiso() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
+            PackageManager.PERMISSION_GRANTED
+        ) {
+        } else {
+            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+}
+
+private val requestPermissionLauncher = registerForActivityResult(
+    ActivityResultContracts.RequestPermission(),
+) { isGranted: Boolean ->
+    if (isGranted) {
+        // Habilitar funciones
+    } else {
+        // Avisar que no habrá notificaciones
+    }
+}
+private fun obtenerToken() {
+    FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+        if (!task.isSuccessful) {
+            println("Error al obtener el token: ${task.exception}")
+            return@OnCompleteListener
+        }
+        val token = task.result
+        println("FCM TOKEN: $token")
+    })
+}
+}
+
+@Composable
+fun Greeting(name: String, modifier: Modifier = Modifier) {
+    Text(
+        text = "Hello $name!",
+        fontSize = 26.sp,
+        modifier = modifier
+    )
 }
