@@ -49,11 +49,16 @@ class AuthAndValidationTest {
         loginButton.performClick()
 
         // 3. Verificar el resultado: deberíamos estar en la pantalla de validación.
-        // Esperamos a que aparezca el texto "Panel de Validación" que es único de esa pantalla.
-        val validationScreenTitle = composeTestRule.onNodeWithText("Panel de Validación")
-        
-        // Espera un tiempo prudencial para la respuesta de la red y la navegación.
-        validationScreenTitle.assertIsDisplayed()
+        // Se espera de forma asíncrona a que aparezca el nodo con el texto.
+        // Esto soluciona el problema de timing al esperar la red y la navegación.
+        composeTestRule.waitUntil(timeoutMillis = 15_000) {
+            composeTestRule
+                .onAllNodesWithText("Panel de Validación")
+                .fetchSemanticsNodes().isNotEmpty()
+        }
+
+        // Una vez que el `waitUntil` confirma que el nodo existe, podemos hacer la aserción final.
+        composeTestRule.onNodeWithText("Panel de Validación").assertIsDisplayed()
     }
 
     @Test
@@ -74,7 +79,7 @@ class AuthAndValidationTest {
                 .onAllNodesWithText("Catálogo de Negocios")
                 .fetchSemanticsNodes().isNotEmpty()
         }
-        
+
         // 3. Verificar que se navega a la pantalla de negocios
         composeTestRule.onNodeWithText("Catálogo de Negocios").assertIsDisplayed()
     }
