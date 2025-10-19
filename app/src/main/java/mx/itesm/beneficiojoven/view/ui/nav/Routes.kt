@@ -62,4 +62,7 @@ sealed class Screen(val route: String) {
         fun path(merchant: String) =
             "couponsFor/${java.net.URLEncoder.encode(merchant, "UTF-8")}"
     }
+
+    /** Pantalla de validación de cupones para Merchants/Admins. */
+    data object Validation : Screen("validation")
 }

@@ -38,7 +38,8 @@ fun FavoritesScreen(
     favoritesVM: FavoritesVM = viewModel(),
     onOpenCoupon: (couponId: String) -> Unit,
     onBack: () -> Unit = {},
-    onOpenFavorites: () -> Unit
+    onOpenFavorites: () -> Unit,
+    onOpenProfile: () -> Unit
 ) {
     // 1. Obtenemos el estado de AMBOS ViewModels
     val loading by vm.loading.collectAsState()
@@ -127,7 +128,8 @@ fun FavoritesScreen(
                 }
             }
             // Reutilizamos el menú inferior
-            BottomMenu(onOpenFavorites = onOpenFavorites)
+            BottomMenu(onOpenFavorites = onOpenFavorites,
+                onOpenProfile = onOpenProfile)
         }
     }
 }

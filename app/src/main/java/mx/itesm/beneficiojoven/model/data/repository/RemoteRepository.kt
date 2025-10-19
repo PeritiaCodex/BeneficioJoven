@@ -1,4 +1,3 @@
-// mx/itesm/beneficiojoven/model/data/repository/RemoteRepository.kt
 package mx.itesm.beneficiojoven.model.data.repository
 
 import mx.itesm.beneficiojoven.model.User
@@ -7,6 +6,8 @@ import mx.itesm.beneficiojoven.model.data.remote.RetrofitClient
 import mx.itesm.beneficiojoven.model.data.remote.Session
 import mx.itesm.beneficiojoven.model.data.remote.dto.LoginReq
 import mx.itesm.beneficiojoven.model.data.remote.dto.toDomain
+import android.util.Log
+import mx.itesm.beneficiojoven.model.Coupon
 
 /**
  * Implementación remota de [AppRepository] que consume el backend vía Retrofit.
@@ -37,13 +38,16 @@ class RemoteRepository : AppRepository {
         }
         val body = res.body() ?: error("Respuesta vacía")
         Session.token = body.token
+        Session.userId = body.id
+
+        Log.d("DEBUG_PROFILE", "ID guardado en Sesión: ${Session.userId}")
 
         val role = when (body.role.lowercase()) {
             "merchant" -> Role.MERCHANT
             "admin", "super_admin" -> Role.ADMIN
             else -> Role.USER
         }
-        User(id = "me", email = email, fullName = "", role = role)
+        User(id = body.id.toString(), email = email, fullName = "", role = role)
     }
 
     /**
@@ -91,13 +95,14 @@ class RemoteRepository : AppRepository {
         }
         val body = loginRes.body() ?: error("Respuesta vacía")
         Session.token = body.token
+        Session.userId = body.id // Guardamos también el ID al registrar
 
         val role = when (body.role.lowercase()) {
             "merchant" -> Role.MERCHANT
             "admin", "super_admin" -> Role.ADMIN
             else -> Role.USER
         }
-        User(id = "me", email = email, fullName = name, role = role)
+        User(id = body.id.toString(), email = email, fullName = name, role = role) // Usamos el ID real
     }
 
     /**
@@ -121,5 +126,20 @@ class RemoteRepository : AppRepository {
     override suspend fun couponById(id: String) = runCatching {
         val list = api.listCoupons()
         list.first { it.coupon_id.toString() == id }.toDomain()
+    }
+
+    /** Obtiene los datos del perfil del usuario y los mapea al modelo de dominio [User].
+      */
+    override suspend fun getProfile(userId: String) = runCatching {
+        val dto = api.getProfile(userId)
+        User( id = userId,
+            email = dto.email,
+            fullName = dto.full_name,
+            municipality = dto.municipality
+        )
+    }
+
+    override suspend fun validateCoupon(code: String): Result<Coupon> = runCatching {
+        api.validate(code).toDomain()
     }
 }

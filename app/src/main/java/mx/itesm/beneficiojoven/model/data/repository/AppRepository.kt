@@ -1,6 +1,7 @@
 // mx/itesm/beneficiojoven/model/data/repository/AppRepository.kt
 package mx.itesm.beneficiojoven.model.data.repository
 
+import mx.itesm.beneficiojoven.model.Coupon
 import mx.itesm.beneficiojoven.model.User
 
 /**
@@ -55,4 +56,18 @@ interface AppRepository {
      * @return [Result] con el cupón o un error si no se encontró.
      */
     suspend fun couponById(id: String): Result<mx.itesm.beneficiojoven.model.Coupon>
+
+    /** Obtiene los datos del perfil de un usuario.
+     * @param userId ID del usuario.
+     * @return [Result] con el [User] o un error.
+     */
+    suspend fun getProfile(userId: String): Result<User>
+
+    /**
+     * Valida un cupón a partir de su código.
+     *
+     * @param code El código del cupón a validar (obtenido del QR).
+     * @return [Result] con el [Coupon] validado o un error si no es válido.
+     */
+    suspend fun validateCoupon(code: String): Result<Coupon>
 }

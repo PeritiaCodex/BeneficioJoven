@@ -3,6 +3,7 @@ package mx.itesm.beneficiojoven.model.data.remote
 import mx.itesm.beneficiojoven.model.data.remote.dto.AuthResponse
 import mx.itesm.beneficiojoven.model.data.remote.dto.CouponDto
 import mx.itesm.beneficiojoven.model.data.remote.dto.LoginReq
+import mx.itesm.beneficiojoven.model.data.remote.dto.ProfileDto
 import okhttp3.ResponseBody
 import retrofit2.http.*
 import retrofit2.Response
@@ -72,4 +73,13 @@ interface BackendApi {
      */
     @POST("coupons/redeem")
     suspend fun redeem(@Body body: Map<String, Any>): Map<String, Any>
+
+    /**
+     * Obtiene los datos de perfil de un joven
+     *
+     * @param userId ID del usuario.
+     * @return [ProfileDto] con los detalles del perfil.
+     */
+    @GET("joven/{userId}")
+    suspend fun getProfile(@Path("userId") userId: String): ProfileDto
 }

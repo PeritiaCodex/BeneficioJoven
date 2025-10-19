@@ -16,7 +16,8 @@ data class User(
     val id: String,
     val email: String,
     val fullName: String,
-    val role: Role = Role.USER
+    val role: Role = Role.USER,
+    val municipality: String? = null
 ) : Parcelable
 
 /**
@@ -68,17 +69,6 @@ data class Coupon(
     val qrUrl: String?,                 // para “ver QR” más adelante
     val isFavorite: Boolean? = false    // agregado
 ) : Parcelable
-
-/**
- * Respuesta de autenticación emitida por el backend tras login.
- *
- * @property token JWT emitido por el servidor.
- * @property role Rol asignado al usuario (cadena).
- */
-data class AuthResponse(
-    val token: String,
-    val role: String
-)
 
 /**
  * DTO de cupón devuelto por el backend.

@@ -15,6 +15,7 @@ import retrofit2.converter.gson.GsonConverterFactory
  */
 object Session {
     @Volatile var token: String? = null
+    @Volatile var userId: Int? = null
 }
 
 /**

@@ -57,7 +57,8 @@ data class Business(
 fun BusinessesScreen(
     vm: CouponListVM,
     onOpenMerchant: (merchantName: String) -> Unit,
-    onOpenFavorites: () -> Unit
+    onOpenFavorites: () -> Unit,
+    onOpenProfile: () -> Unit
 ) {
     val loading by vm.loading.collectAsState()
     val error by vm.error.collectAsState()
@@ -131,7 +132,8 @@ fun BusinessesScreen(
                 }
             }
 
-            BottomMenu(onOpenFavorites = onOpenFavorites)
+            BottomMenu(onOpenFavorites = onOpenFavorites,
+                onOpenProfile = onOpenProfile)
         }
     }
 }
@@ -329,7 +331,8 @@ fun BusinessCard(
  */
 @Composable
 fun BottomMenu(
-    onOpenFavorites: () -> Unit
+    onOpenFavorites: () -> Unit,
+    onOpenProfile: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -356,7 +359,7 @@ fun BottomMenu(
                 modifier = Modifier.size(32.dp)
             )
         }
-        IconButton(onClick = { /* Usuario */ }) {
+        IconButton(onClick = { onOpenProfile() }) {
             Icon(
                 imageVector = Icons.Default.AccountCircle,
                 contentDescription = "Usuario",

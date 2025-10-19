@@ -5,14 +5,8 @@ import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import mx.itesm.beneficiojoven.view.ui.screens.BusinessesScreen
-import mx.itesm.beneficiojoven.view.ui.screens.RegisterScreen
-import mx.itesm.beneficiojoven.view.ui.screens.CouponScreen
-import mx.itesm.beneficiojoven.view.ui.screens.FavoritesScreen
-import mx.itesm.beneficiojoven.view.ui.screens.ForgotScreen
-import mx.itesm.beneficiojoven.view.ui.screens.LoginScreen
-import mx.itesm.beneficiojoven.view.ui.screens.ProfileScreen
-import mx.itesm.beneficiojoven.view.ui.screens.TermsScreen
+import mx.itesm.beneficiojoven.model.Role
+import mx.itesm.beneficiojoven.view.ui.screens.*
 import mx.itesm.beneficiojoven.vm.AuthViewModel
 import mx.itesm.beneficiojoven.vm.CouponListVM
 
@@ -21,13 +15,14 @@ import mx.itesm.beneficiojoven.vm.CouponListVM
  *
  * Define el grafo de pantallas de la app y las transiciones entre ellas:
  *
- * - **Login** → al autenticarse, navega a [Screen.Businesses].
+ * - **Login** → al autenticarse, navega a [Screen.Businesses] o [Screen.Validation] según el rol.
  * - **Register** → al registrarse, navega a [Screen.Businesses]; permite volver con *back*.
  * - **Forgot** / **Terms** / **Profile** → pantallas secundarias con *back*.
  * - **Businesses** → listado de negocios; desde aquí se navega a cupones por comercio.
  * - **CouponsByMerchant** → lista de cupones de un comercio específico.
  * - **Favorites** → lista de favoritos con acceso al detalle de cupón.
  * - **CouponDetail** → detalle de un cupón por `id`.
+ * - **Validation** → pantalla para escanear y validar cupones (admins/merchants).
  *
  * @param nav Controlador de navegación de nivel superior.
  */
@@ -41,7 +36,13 @@ fun AppNavHost(nav: NavHostController) {
         composable(Screen.Login.route) {
             LoginScreen(
                 vm = authVM,
-                onLogged = { nav.navigate(Screen.Businesses.route) { popUpTo(0) } },
+                onLogged = { user ->
+                    val destination = when (user.role) {
+                        Role.ADMIN, Role.MERCHANT -> Screen.Validation.route
+                        else -> Screen.Businesses.route
+                    }
+                    nav.navigate(destination) { popUpTo(0) }
+                },
                 onRegister = { nav.navigate(Screen.Register.route) },
                 onForgot = { nav.navigate(Screen.Forgot.route) },
                 onTerms = { nav.navigate(Screen.Terms.route) }
@@ -51,6 +52,7 @@ fun AppNavHost(nav: NavHostController) {
             RegisterScreen(
                 vm = authVM,
                 onRegistered = {
+                    // Por defecto, tras registrarse se va a la pantalla de usuario
                     nav.navigate(Screen.Businesses.route) { popUpTo(0) }
                 },
                 onBack = { nav.popBackStack() }
@@ -65,22 +67,38 @@ fun AppNavHost(nav: NavHostController) {
                 onOpenMerchant = { merchant ->
                     nav.navigate(Screen.CouponsByMerchant.path(merchant))
                 },
-                onOpenFavorites = { nav.navigate(Screen.Favorites.route) }
+                onOpenFavorites = { nav.navigate(Screen.Favorites.route) },
+                onOpenProfile = { nav.navigate(Screen.Profile.route) }
             )
         }
+
         composable(Screen.CouponsByMerchant.route) { backStackEntry ->
             val merchant = backStackEntry.arguments?.getString("merchant")?.let { java.net.URLDecoder.decode(it, "UTF-8") } ?: return@composable
             CouponScreen(merchantName = merchant, vm = listVM, onBack = { nav.popBackStack() })
         }
 
-        composable(Screen.Profile.route) { ProfileScreen(onBack = { nav.popBackStack() }) }
+        composable(Screen.Profile.route) {
+            ProfileScreen(
+                onBack = { nav.popBackStack() },
+                onLogout = {
+                    nav.navigate(Screen.Login.route) {
+                        popUpTo(0) // Limpia toda la pila de navegación
+                    }
+                }
+            )
+        }
 
         composable(Screen.Favorites.route) {
             FavoritesScreen(
                 onBack = { nav.popBackStack() },
                 onOpenCoupon = { id -> nav.navigate(Screen.CouponDetail.path(id)) },
-                onOpenFavorites = {  }
+                onOpenFavorites = {  },
+                onOpenProfile = { nav.navigate(Screen.Profile.route) }
             )
+        }
+
+        composable(Screen.Validation.route) {
+            ValidationScreen() // Llama a la pantalla que ya contiene su propia lógica.
         }
     }
 }

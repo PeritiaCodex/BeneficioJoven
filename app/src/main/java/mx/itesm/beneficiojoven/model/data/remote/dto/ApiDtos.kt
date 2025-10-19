@@ -37,4 +37,15 @@ data class CouponDto(
  * @property email Correo electrónico.
  * @property password Contraseña en texto plano.
  */
-data class LoginReq(val email: String, val password: String)
+data class LoginReq(
+    val email: String,
+    val password: String
+)
+
+data class ProfileDto(
+    val email: String,
+    val full_name: String,
+    val curp: String,
+    val valid_from: String,
+    val municipality: String
+)

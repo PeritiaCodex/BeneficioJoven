@@ -70,6 +70,8 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-intents:3.7.0")
     androidTestImplementation("androidx.test:rules:1.7.0")
 
+    // --- Escáner de código QR de Google Play Services ---
+    implementation(libs.play.services.code.scanner)
 
     implementation("androidx.compose.material3:material3:<composeVersion>")
     implementation("androidx.compose.material:material-icons-extended:<composeVersion>")
@@ -79,7 +81,7 @@ dependencies {
     implementation("androidx.room:room-ktx:$room")
     kapt("androidx.room:room-compiler:$room")
 
-    implementation("io.coil-kt:coil-svg:2.6.0")
+    implementation("io.coil-kt:coil-svg:2.7.0")
 
     // --- Tests (de tu catálogo) ---
     testImplementation(libs.junit)
