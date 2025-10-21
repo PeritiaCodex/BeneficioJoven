@@ -6,48 +6,36 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.RoundRect
-import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
-import mx.itesm.beneficiojoven.vm.CouponListVM
 import mx.itesm.beneficiojoven.model.Coupon
 import mx.itesm.beneficiojoven.view.ui.rememberAppImageLoader
-import androidx.compose.material.icons.filled.Bookmark
-import androidx.lifecycle.viewmodel.compose.viewModel
+import mx.itesm.beneficiojoven.vm.CouponListVM
 import mx.itesm.beneficiojoven.vm.FavoritesVM
-
 
 /**
  * Pantalla que muestra los **cupones disponibles** para un comercio específico.
- *
- * Consume el estado expuesto por [CouponListVM], filtra por [merchantName] y
- * despliega tarjetas con la información del cupón, incluyendo una sección
- * expandible con **QR** y código.
- *
- * También muestra barra de filtros superpuesta y un botón “Atrás”.
  *
  * @param merchantName Nombre del comercio por el que se filtrará la lista.
  * @param vm ViewModel que provee la colección completa de cupones y estados de carga/error.
@@ -70,12 +58,10 @@ fun CouponScreen(
     val coupons = remember(all, merchantName) { all.filter { it.merchant.name == merchantName } }
     val merchantInfo = coupons.firstOrNull()
 
-    var isFilterExpanded by remember { mutableStateOf(false) }
     var expandedCouponId by remember { mutableStateOf<String?>(null) }
 
     GradientScreenLayout {
         Column(Modifier.fillMaxSize()) {
-            // título dinámico
             Spacer(Modifier.height(14.dp))
             Box(
                 modifier = Modifier.fillMaxWidth(),
@@ -88,14 +74,13 @@ fun CouponScreen(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Atrás",
-                        tint = Color.White
+                        tint = MaterialTheme.colorScheme.outlineVariant
                     )
                 }
                 Text(
                     text = "Cupones Disponibles",
-                    color = Color.White,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.outlineVariant
                 )
             }
             if (merchantInfo != null) {
@@ -110,35 +95,34 @@ fun CouponScreen(
             Box(Modifier.weight(1f)) {
                 when {
                     loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator()
+                        CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary)
                     }
                     error != null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("Error: $error", color = Color.White)
+                            Text("Error: $error", color = MaterialTheme.colorScheme.onError)
                             Spacer(Modifier.height(8.dp))
                             Button(onClick = vm::refresh) { Text("Reintentar") }
                         }
                     }
                     coupons.isEmpty() -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("No hay cupones para $merchantName", color = Color.White)
+                        Text("No hay cupones para $merchantName", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     else -> LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.spacedBy(24.dp),
-                        contentPadding = PaddingValues(bottom = 80.dp) // sin top padding
+                        contentPadding = PaddingValues(bottom = 80.dp)
                     ) {
                         items(coupons, key = { it.id }) { c ->
-
                             val isFavorite by favoritesVM.repo().isFavoriteFlow(c.id).collectAsState(initial = false)
 
                             CouponCard(
                                 coupon = c,
                                 isExpanded = (expandedCouponId == c.id),
-                                isFavorite = isFavorite, // <-- PASA EL ESTADO
+                                isFavorite = isFavorite,
                                 onClick = {
                                     expandedCouponId = if (expandedCouponId == c.id) null else c.id
                                 },
-                                onToggleFavorite = { // <-- PASA LA ACCIÓN
+                                onToggleFavorite = {
                                     favoritesVM.toggle(c, !isFavorite)
                                 }
                             )
@@ -147,8 +131,10 @@ fun CouponScreen(
                 }
             }
 
-            BottomMenu(onOpenFavorites = onOpenFavorites,
-                onOpenProfile = onOpenProfile)
+            BottomMenu(
+                onOpenFavorites = onOpenFavorites,
+                onOpenProfile = onOpenProfile
+            )
         }
     }
 }
@@ -156,20 +142,17 @@ fun CouponScreen(
 /**
  * Cabecera fija del comercio actual.
  *
- * Muestra el **logo** (si existe; en caso contrario un placeholder) y el nombre
- * del comercio. Incluye un **switch** para simular suscripción a notificaciones.
- *
  * @param name Nombre del comercio.
  * @param logoUrl URL del logo (puede ser nulo).
  */
 @Composable
 fun MerchantHeaderCard(name: String, logoUrl: String?) {
     val imageLoader = rememberAppImageLoader()
-
     var isSubscribed by remember { mutableStateOf(false) }
+
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.2f)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f)),
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
@@ -182,25 +165,34 @@ fun MerchantHeaderCard(name: String, logoUrl: String?) {
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .size(50.dp)
-                    .background(Color.White, CircleShape)
+                    .background(MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.25f), CircleShape)
                     .padding(4.dp)
             )
             Spacer(Modifier.width(16.dp))
             Column(Modifier.weight(1f)) {
-                Text("Cupones de:",
-                    color = Color.White.copy(alpha = 0.8f),
-                    fontSize = 12.sp)
-                Text(name, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Text(
+                    "Cupones de:",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
+                )
+                Text(
+                    name,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.outlineVariant
+                )
             }
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(imageVector = Icons.Default.Notifications,
-                    contentDescription = "Suscripción", tint = Color.White)
+                Icon(
+                    imageVector = Icons.Default.Notifications,
+                    contentDescription = "Suscripción",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
                 Switch(
                     checked = isSubscribed,
                     onCheckedChange = { isSubscribed = it },
                     colors = SwitchDefaults.colors(
-                        checkedThumbColor = Color.White,
-                        checkedTrackColor = Color(0xFF3B82F6)
+                        checkedTrackColor = MaterialTheme.colorScheme.onPrimary,
+                        checkedThumbColor = MaterialTheme.colorScheme.onSecondary
                     )
                 )
             }
@@ -210,9 +202,6 @@ fun MerchantHeaderCard(name: String, logoUrl: String?) {
 
 /**
  * Tarjeta visual de un **cupón** con forma de boleto (Ticket).
- *
- * La parte superior muestra logo e información del cupón; al expandirla,
- * se presentan el **QR** y el texto del código.
  *
  * @param coupon Modelo de dominio del cupón.
  * @param isExpanded Controla si se muestra la sección expandida.
@@ -233,7 +222,7 @@ fun CouponCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.95f))
+        colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.25f))
     ) {
         Column {
             Box {
@@ -241,7 +230,6 @@ fun CouponCard(
                     modifier = Modifier.height(140.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Izquierda: Logo del comercio
                     Box(
                         modifier = Modifier
                             .fillMaxHeight()
@@ -260,7 +248,6 @@ fun CouponCard(
 
                     DottedVerticalDivider()
 
-                    // Derecha: Detalles
                     Column(
                         modifier = Modifier
                             .fillMaxHeight()
@@ -271,39 +258,39 @@ fun CouponCard(
                         Column {
                             Text(
                                 text = coupon.title,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 18.sp,
-                                color = Color.Black,
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.outlineVariant,
                                 maxLines = 2,
                                 overflow = TextOverflow.Ellipsis
                             )
-                            Text(text = coupon.merchant.name, fontSize = 12.sp, color = Color.Gray)
+                            Text(
+                                text = coupon.merchant.name,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         }
                         Text(
                             text = "Válido hasta: ${coupon.validUntil ?: "N/D"}",
-                            fontSize = 11.sp,
-                            color = Color.DarkGray
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
 
-                // Botón Guardar (favoritos)
                 IconButton(
-                    onClick = onToggleFavorite, // <-- Llama a la acción del ViewModel
+                    onClick = onToggleFavorite,
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(4.dp)
                 ) {
                     Icon(
-                        // Cambia el ícono y el color según el estado
                         imageVector = if (isFavorite) Icons.Filled.Bookmark else Icons.Default.BookmarkBorder,
                         contentDescription = if (isFavorite) "Quitar de Favoritos" else "Guardar Cupón",
-                        tint = if (isFavorite) Color(0xFF3B82F6) else Color.Gray
+                        tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
 
-            // Sección expandible: QR y código
             AnimatedVisibility(visible = isExpanded) {
                 Column(
                     modifier = Modifier
@@ -321,9 +308,8 @@ fun CouponCard(
                     Spacer(Modifier.height(8.dp))
                     Text(
                         text = "Código: ${coupon.discountText}",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
-                        color = Color.Black
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
@@ -336,14 +322,18 @@ fun CouponCard(
  */
 @Composable
 fun DottedVerticalDivider() {
+    val dividerColor = MaterialTheme.colorScheme.outlineVariant
     Canvas(modifier = Modifier
         .fillMaxHeight()
         .width(1.dp)) {
         val pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
-        drawLine(color = Color.LightGray,
+        drawLine(
+            color = dividerColor,
             start = Offset(0f, 0f),
             end = Offset(0f, size.height),
-            strokeWidth = 2f, pathEffect = pathEffect)
+            strokeWidth = 2f,
+            pathEffect = pathEffect
+        )
     }
 }
 
@@ -352,30 +342,30 @@ fun DottedVerticalDivider() {
  */
 @Composable
 fun DottedHorizontalDivider() {
+    val dividerColor = MaterialTheme.colorScheme.outlineVariant
     Canvas(modifier = Modifier
         .fillMaxWidth()
         .height(1.dp)) {
         val pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
-        drawLine(color = Color.LightGray,
+        drawLine(
+            color = dividerColor,
             start = Offset(0f, 0f),
             end = Offset(size.width, 0f),
-            strokeWidth = 2f, pathEffect = pathEffect)
+            strokeWidth = 2f,
+            pathEffect = pathEffect
+        )
     }
 }
 
 /**
- * Forma personalizada de **boleto (ticket)** con esquinas redondeadas
- * y dos muescas circulares laterales.
- *
- * @param cornerRadius Radio de las esquinas.
- * @param notchRadius Radio de cada muesca lateral.
+ * Forma personalizada de **boleto (ticket)**.
  */
 class TicketShape(private val cornerRadius: Float, private val notchRadius: Float) : Shape {
     override fun createOutline(size: Size, layoutDirection: LayoutDirection, density: Density): Outline {
         val path = Path().apply {
             fillType = PathFillType.EvenOdd
-            addRoundRect(RoundRect(Rect(Offset.Zero, size),
-                CornerRadius(cornerRadius)))
+            addRoundRect(RoundRect(Rect(Offset.Zero, size), CornerRadius(cornerRadius)))
+
             val leftNotchRect = Rect(
                 left = -notchRadius,
                 top = size.height / 2 - notchRadius,
@@ -383,6 +373,7 @@ class TicketShape(private val cornerRadius: Float, private val notchRadius: Floa
                 bottom = size.height / 2 + notchRadius
             )
             addOval(leftNotchRect)
+
             val rightNotchRect = Rect(
                 left = size.width - notchRadius,
                 top = size.height / 2 - notchRadius,

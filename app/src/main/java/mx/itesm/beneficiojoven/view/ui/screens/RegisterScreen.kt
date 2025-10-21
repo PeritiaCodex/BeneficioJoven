@@ -1,7 +1,7 @@
 package mx.itesm.beneficiojoven.view.ui.screens
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -9,7 +9,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -22,35 +21,15 @@ import androidx.compose.ui.unit.sp
 import mx.itesm.beneficiojoven.R
 import mx.itesm.beneficiojoven.vm.AuthViewModel
 
-/**
- * Pantalla de **registro de usuario**.
- *
- * Presenta un formulario con validaciones básicas (correo, contraseña, CURP, municipio y nombre),
- * aceptación de términos y, al confirmar, invoca [AuthViewModel.register]. Si el flujo concluye
- * con éxito (es decir, [AuthViewModel.user] deja de ser `null`), se ejecuta [onRegistered].
- *
- * El diseño utiliza un fondo con degradado, tarjeta translúcida y contenido desplazable.
- *
- * @param vm ViewModel responsable de la autenticación/registro.
- * @param onBack Acción para regresar a la pantalla previa.
- * @param onRegistered Acción a ejecutar tras registrarse (y típicamente hacer *auto-login*).
- * @see AuthViewModel.register
- */
 @Composable
 fun RegisterScreen(
     vm: AuthViewModel,
     onBack: () -> Unit = {},
     onRegistered: () -> Unit = {}
 ) {
-    // Estado VM
     val loading by vm.loading.collectAsState()
     val error by vm.error.collectAsState()
     val user by vm.user.collectAsState()
-
-    // Gradiente de fondo
-    val backgroundBrush = Brush.verticalGradient(
-        colors = listOf(Color(0xFF4A90E2), Color(0xFF7B4397))
-    )
 
     var curp by remember { mutableStateOf("") }
     var nombre by remember { mutableStateOf("") }
@@ -60,7 +39,6 @@ fun RegisterScreen(
     var confirmarContrasena by remember { mutableStateOf("") }
     var aceptoTerminos by remember { mutableStateOf(false) }
 
-    // Validaciones simples
     val emailOk = remember(correo) { correo.contains("@") && correo.contains(".") }
     val passOk = remember(contrasena) { contrasena.length >= 6 }
     val confirmOk = remember(contrasena, confirmarContrasena) { contrasena == confirmarContrasena }
@@ -69,15 +47,9 @@ fun RegisterScreen(
     val nameOk = remember(nombre) { nombre.isNotBlank() }
     val formOk = emailOk && passOk && confirmOk && curpOk && muniOk && nameOk && aceptoTerminos && !loading
 
-    // Navega cuando ya haya user
     LaunchedEffect(user) { if (user != null) onRegistered() }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(brush = backgroundBrush)
-            .padding(16.dp)
-    ) {
+    GradientScreenLayout {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -112,7 +84,7 @@ fun RegisterScreen(
                     .fillMaxWidth()
                     .padding(8.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color(0x8021212A)
+                    containerColor = MaterialTheme.colorScheme.scrim.copy(alpha = 0.5f)
                 ),
                 elevation = CardDefaults.cardElevation(8.dp)
             ) {
@@ -130,22 +102,28 @@ fun RegisterScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // --- Campos ---
+                    val textFieldColors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.LightGray,
+                        focusedLabelColor = MaterialTheme.colorScheme.onTertiary,
+                        unfocusedLabelColor = Color.LightGray,
+                        cursorColor = MaterialTheme.colorScheme.onTertiary,
+                        errorContainerColor = Color.Transparent,
+                        focusedIndicatorColor = MaterialTheme.colorScheme.tertiary,
+                        unfocusedIndicatorColor = Color.Gray.copy(alpha = 0.5f),
+                        errorIndicatorColor = MaterialTheme.colorScheme.error
+                    )
+
+                    // --- Campos de texto ---
                     OutlinedTextField(
                         value = curp,
                         onValueChange = { curp = it.uppercase() },
                         label = { Text("CURP") },
                         isError = curp.isNotBlank() && !curpOk,
                         supportingText = { if (curp.isNotBlank() && !curpOk) Text("Debe tener 18 caracteres") },
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White,
-                            focusedLabelColor = Color.White,
-                            unfocusedLabelColor = Color.Gray,
-                            cursorColor = Color.White
-                        ),
+                        colors = textFieldColors,
                         modifier = Modifier.fillMaxWidth()
                     )
 
@@ -155,15 +133,7 @@ fun RegisterScreen(
                         onValueChange = { nombre = it },
                         label = { Text("Nombre") },
                         isError = nombre.isNotBlank() && !nameOk,
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White,
-                            focusedLabelColor = Color.White,
-                            unfocusedLabelColor = Color.Gray,
-                            cursorColor = Color.White
-                        ),
+                        colors = textFieldColors,
                         modifier = Modifier.fillMaxWidth()
                     )
 
@@ -174,15 +144,7 @@ fun RegisterScreen(
                         label = { Text("Correo") },
                         isError = correo.isNotBlank() && !emailOk,
                         supportingText = { if (correo.isNotBlank() && !emailOk) Text("Correo no válido") },
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White,
-                            focusedLabelColor = Color.White,
-                            unfocusedLabelColor = Color.Gray,
-                            cursorColor = Color.White
-                        ),
+                        colors = textFieldColors,
                         modifier = Modifier.fillMaxWidth()
                     )
 
@@ -192,15 +154,7 @@ fun RegisterScreen(
                         onValueChange = { municipio = it },
                         label = { Text("Municipio") },
                         isError = municipio.isNotBlank() && !muniOk,
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White,
-                            focusedLabelColor = Color.White,
-                            unfocusedLabelColor = Color.Gray,
-                            cursorColor = Color.White
-                        ),
+                        colors = textFieldColors,
                         modifier = Modifier.fillMaxWidth()
                     )
 
@@ -212,15 +166,7 @@ fun RegisterScreen(
                         visualTransformation = PasswordVisualTransformation(),
                         isError = contrasena.isNotBlank() && !passOk,
                         supportingText = { if (contrasena.isNotBlank() && !passOk) Text("Mínimo 6 caracteres") },
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White,
-                            focusedLabelColor = Color.White,
-                            unfocusedLabelColor = Color.Gray,
-                            cursorColor = Color.White
-                        ),
+                        colors = textFieldColors,
                         modifier = Modifier.fillMaxWidth()
                     )
 
@@ -232,25 +178,22 @@ fun RegisterScreen(
                         visualTransformation = PasswordVisualTransformation(),
                         isError = confirmarContrasena.isNotBlank() && !confirmOk,
                         supportingText = { if (confirmarContrasena.isNotBlank() && !confirmOk) Text("No coincide") },
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White,
-                            focusedLabelColor = Color.White,
-                            unfocusedLabelColor = Color.Gray,
-                            cursorColor = Color.White
-                        ),
+                        colors = textFieldColors,
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
+                    // --- Texto clickeable de Términos y Condiciones ---
                     Text(
                         text = "Términos y Condiciones",
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onTertiary,
                         fontSize = 14.sp,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier
+                            .clickable { /* TODO: abrir enlace o modal */ }
+                            .padding(vertical = 4.dp)
                     )
 
                     Row(
@@ -261,9 +204,9 @@ fun RegisterScreen(
                             checked = aceptoTerminos,
                             onCheckedChange = { aceptoTerminos = it },
                             colors = CheckboxDefaults.colors(
-                                checkedColor = Color(0xFF4A90E2),
+                                checkedColor = MaterialTheme.colorScheme.onPrimary,
                                 uncheckedColor = Color.LightGray,
-                                checkmarkColor = Color.White
+                                checkmarkColor = MaterialTheme.colorScheme.onSecondary
                             )
                         )
                         Text(
@@ -292,7 +235,7 @@ fun RegisterScreen(
                         },
                         enabled = formOk,
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF4A90E2)
+                            containerColor = MaterialTheme.colorScheme.onPrimary
                         ),
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -300,7 +243,7 @@ fun RegisterScreen(
                             CircularProgressIndicator(
                                 modifier = Modifier.size(20.dp),
                                 strokeWidth = 2.dp,
-                                color = Color.White
+                                color = MaterialTheme.colorScheme.onPrimary
                             )
                             Spacer(Modifier.width(12.dp))
                         }
@@ -312,11 +255,11 @@ fun RegisterScreen(
                     Button(
                         onClick = onBack,
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF7B4397)
+                            containerColor = MaterialTheme.colorScheme.onSecondary
                         ),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Regresar", color = Color.White)
+                        Text("Regresar", color = Color.LightGray)
                     }
                 }
             }
@@ -324,14 +267,9 @@ fun RegisterScreen(
     }
 }
 
-/**
- * *Preview* de la pantalla de registro.
- *
- * > Nota: está desactivado por depender de un [AuthViewModel].
- */
 @Preview
 @Composable
 private fun RegisterScreenPreview() {
-    // Preview sin VM (no interactivo)
+    // Preview sin VM
     // RegisterScreen(vm = AuthViewModel())
 }

@@ -53,16 +53,7 @@ fun LoginScreen(
     // Evita navegar múltiples veces en recomposición
     LaunchedEffect(user) { user?.let { onLogged(it) } }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(Color(0xFF3B82F6), Color(0xFF6D28D9)) // azul → morado
-                )
-            ),
-        contentAlignment = Alignment.Center
-    ) {
+    GradientScreenLayout {
         Column(
             modifier = Modifier
                 .padding(24.dp)
@@ -70,7 +61,6 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Logo OFFLINE
             Image(
                 painter = painterResource(id = R.drawable.logo_sf),
                 contentDescription = "Logo Beneficio Joven",
@@ -84,8 +74,10 @@ fun LoginScreen(
 
             Spacer(Modifier.height(24.dp))
 
-            Card(
-                colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.15f)),
+            Surface(
+                shape = CardDefaults.shape,
+                shadowElevation = 8.dp,
+                color = MaterialTheme.colorScheme.scrim.copy(alpha = 0.2f),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp)
@@ -97,50 +89,38 @@ fun LoginScreen(
                     Text("Login", color = Color.White, fontSize = 20.sp)
                     Spacer(Modifier.height(16.dp))
 
-                    // --- CORREO con colores custom ---
+                    val textFieldColors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.tertiary,
+                        unfocusedBorderColor = Color.Gray,
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        focusedLabelColor = MaterialTheme.colorScheme.onTertiary,
+                        unfocusedLabelColor = Color.LightGray,
+                        cursorColor = MaterialTheme.colorScheme.tertiary,
+                    )
+
                     OutlinedTextField(
                         value = email,
                         onValueChange = { email = it },
-                        placeholder = { Text("Correo electrónico") },
+                        label = { Text("Correo electrónico") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                         singleLine = true,
                         enabled = !loading,
-                        modifier = Modifier.fillMaxWidth().testTag("email_input"),
-                        colors = TextFieldDefaults.colors(
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White,
-                            focusedPlaceholderColor = Color.LightGray,
-                            unfocusedPlaceholderColor = Color.LightGray,
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            cursorColor = Color.White,
-                            focusedIndicatorColor = Color.White,
-                            unfocusedIndicatorColor = Color.White.copy(alpha = 0.6f)
-                        )
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = textFieldColors
                     )
 
                     Spacer(Modifier.height(8.dp))
 
-                    // --- CONTRASEÑA con colores custom ---
                     OutlinedTextField(
                         value = password,
                         onValueChange = { password = it },
-                        placeholder = { Text("Contraseña") },
+                        label = { Text("Contraseña") },
                         visualTransformation = PasswordVisualTransformation(),
                         singleLine = true,
                         enabled = !loading,
-                        modifier = Modifier.fillMaxWidth().testTag("password_input"),
-                        colors = TextFieldDefaults.colors(
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White,
-                            focusedPlaceholderColor = Color.LightGray,
-                            unfocusedPlaceholderColor = Color.LightGray,
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            cursorColor = Color.White,
-                            focusedIndicatorColor = Color.White,
-                            unfocusedIndicatorColor = Color.White.copy(alpha = 0.6f)
-                        )
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = textFieldColors
                     )
 
                     Spacer(Modifier.height(8.dp))
@@ -154,9 +134,9 @@ fun LoginScreen(
                             onCheckedChange = { keepSession = it },
                             enabled = !loading,
                             colors = CheckboxDefaults.colors(
-                                checkedColor = Color(0xFF3B82F6),
+                                checkedColor = MaterialTheme.colorScheme.onPrimary,
                                 uncheckedColor = Color.LightGray,
-                                checkmarkColor = Color.White
+                                checkmarkColor = MaterialTheme.colorScheme.onSecondary
                             )
                         )
                         Text("Mantener la sesión iniciada", color = Color.White, fontSize = 14.sp)
@@ -166,9 +146,12 @@ fun LoginScreen(
 
                     Button(
                         onClick = { vm.login(email.trim(), password) },
-                        modifier = Modifier.fillMaxWidth().testTag("login_button"),
+                        modifier = Modifier.fillMaxWidth(),
                         enabled = !loading,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3B82F6))
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.onPrimary,
+                            contentColor = Color.White
+                        )
                     ) { Text(if (loading) "Entrando..." else "Login") }
 
                     Spacer(Modifier.height(8.dp))
@@ -177,7 +160,10 @@ fun LoginScreen(
                         onClick = onRegister,
                         modifier = Modifier.fillMaxWidth(),
                         enabled = !loading,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6B7280))
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.onSecondary,
+                            contentColor = Color.White
+                        )
                     ) { Text("Registrarse") }
 
                     Spacer(Modifier.height(8.dp))
@@ -202,7 +188,7 @@ fun LoginScreen(
 
         if (loading) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = Color.White)
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
         }
     }
