@@ -15,6 +15,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,9 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import coil.compose.AsyncImage
-import androidx.compose.material.icons.filled.CreditCard
 import mx.itesm.beneficiojoven.view.ui.components.LiquidGlassCard
-import mx.itesm.beneficiojoven.view.ui.components.LocalBackdropBrush
 import mx.itesm.beneficiojoven.view.ui.rememberAppImageLoader
 import mx.itesm.beneficiojoven.vm.CouponListVM
 
@@ -94,11 +94,11 @@ fun BusinessesScreen(
             Box(modifier = Modifier.weight(1f)) {
                 when {
                     loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator()
+                        CircularProgressIndicator(color = MaterialTheme.colorScheme.onSecondary)
                     }
                     error != null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("Error: $error", color = Color.White)
+                            Text("Error: $error", color = MaterialTheme.colorScheme.onError)
                             Spacer(Modifier.height(8.dp))
                             Button(onClick = vm::refresh) { Text("Reintentar") }
                         }
@@ -151,7 +151,7 @@ fun Header() {
     ) {
         Text(
             text = "Catálogo de Negocios",
-            color = Color.White,
+            color = MaterialTheme.colorScheme.outlineVariant,
             fontSize = 26.sp,
             fontWeight = FontWeight.Bold
         )
@@ -167,7 +167,7 @@ fun Header() {
 @Composable
 fun FilterBar(isExpanded: Boolean, onToggle: () -> Unit) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color.Gray.copy(alpha = 0.65f)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.65f)),
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
@@ -185,7 +185,7 @@ fun FilterBar(isExpanded: Boolean, onToggle: () -> Unit) {
                 Icon(
                     imageVector = if (isExpanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
                     contentDescription = "Expandir filtros",
-                    tint = Color.White
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -206,7 +206,7 @@ fun ExpandedFiltersPanel(visible: Boolean) {
 
     AnimatedVisibility(visible = visible) {
         Card(
-            colors = CardDefaults.cardColors(containerColor = Color.DarkGray.copy(alpha = .75f)),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onSecondary.copy(alpha = .5f)),
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.medium.copy(topStart = CornerSize(0), topEnd = CornerSize(0))
         ) {
@@ -234,14 +234,14 @@ fun ExpandedFiltersPanel(visible: Boolean) {
 @Composable
 fun FilterChip(label: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Surface(
-        color = Color.White.copy(alpha = 0.2f),
+        color = MaterialTheme.colorScheme.surfaceTint,
         shape = MaterialTheme.shapes.small,
         modifier = modifier.clickable { onClick() }
     ) {
         Text(
             text = label,
-            color = Color.White,
-            fontSize = 14.sp,
+            color = MaterialTheme.colorScheme.outlineVariant,
+            style = MaterialTheme.typography.labelMedium,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)
         )
@@ -266,7 +266,6 @@ fun BusinessCard(
     type: String
 ) {
     val imageLoader = rememberAppImageLoader()
-    val backdrop = LocalBackdropBrush.current   // del GradientScreenLayout
 
     LiquidGlassCard(
         modifier = Modifier
@@ -275,9 +274,9 @@ fun BusinessCard(
             .clickable { onClick() },
         shape = RoundedCornerShape(22.dp),
         cornerRadius = 22.dp,
-        blurRadius = 18.dp,     // detalle del fondo más nítido
-        tintAlpha = 0.04f,      // velo súper ligero
-        backdropAlpha = 0.95f,  // deja pasar casi el fondo
+        blurRadius = 18.dp,
+        tintAlpha = 0.04f,
+        backdropAlpha = 0.95f,
         borderAlpha = 0.22f,
         highlightAlpha = 0.10f
     ) {
@@ -287,7 +286,6 @@ fun BusinessCard(
                 .padding(12.dp),
             verticalAlignment = Alignment.Top
         ) {
-
             AsyncImage(
                 model = imageUrl,
                 imageLoader = imageLoader,
@@ -305,26 +303,30 @@ fun BusinessCard(
                 ) {
                     Text(
                         text = title,
-                        color = Color.Black,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSecondary,
                         modifier = Modifier.weight(1f, fill = false)
                     )
                     Text(
                         text = type,
-                        color = Color.DarkGray,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary,
                         textAlign = TextAlign.End,
                         modifier = Modifier.padding(start = 8.dp)
                     )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(text = description, color = Color.Gray, fontSize = 14.sp, maxLines = 4)
+                Text(
+                    text = description,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 4
+                )
             }
         }
     }
 }
+
 
 /**
  * Menú inferior con accesos rápidos a **Tarjeta**, **Cupones** y **Usuario**.
@@ -338,7 +340,7 @@ fun BottomMenu(
         modifier = Modifier
             .fillMaxWidth()
             .height(70.dp)
-            .background(Color.White.copy(alpha = 0.15f))
+            .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.25f))
             .padding(horizontal = 24.dp),
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
@@ -347,7 +349,7 @@ fun BottomMenu(
             Icon(
                 imageVector = Icons.Default.Favorite,
                 contentDescription = "Favoritos",
-                tint = Color.White,
+                tint = MaterialTheme.colorScheme.surfaceTint,
                 modifier = Modifier.size(32.dp)
             )
         }
@@ -355,7 +357,7 @@ fun BottomMenu(
             Icon(
                 imageVector = Icons.Default.LocalOffer,
                 contentDescription = "Cupones",
-                tint = Color.White,
+                tint = MaterialTheme.colorScheme.surfaceTint,
                 modifier = Modifier.size(32.dp)
             )
         }
@@ -363,7 +365,7 @@ fun BottomMenu(
             Icon(
                 imageVector = Icons.Default.AccountCircle,
                 contentDescription = "Usuario",
-                tint = Color.White,
+                tint = MaterialTheme.colorScheme.surfaceTint,
                 modifier = Modifier.size(32.dp)
             )
         }

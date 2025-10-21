@@ -3,6 +3,7 @@ package mx.itesm.beneficiojoven.view.ui.screens
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,8 +14,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -27,7 +30,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import mx.itesm.beneficiojoven.view.ui.components.GradientScreenLayout
@@ -37,6 +39,8 @@ import mx.itesm.beneficiojoven.vm.ValidationViewModel
  * Pantalla principal para roles de Merchant y Admin.
  *
  * Orquesta el escaneo de códigos QR y muestra el resultado de la validación.
+ *
+ * @param vm El ViewModel que maneja la lógica de validación de cupones.
  */
 @Composable
 fun ValidationScreen(
@@ -49,37 +53,42 @@ fun ValidationScreen(
     val isLoading by vm.isLoading.collectAsState()
     val error by vm.error.collectAsState()
 
-    GradientScreenLayout {
+    // El layout principal ahora controla el padding para que el fondo ocupe todo.
+    GradientScreenLayout(contentPadding = PaddingValues(16.dp)) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
+            modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             if (isLoading) {
-                CircularProgressIndicator(color = Color.White)
+                // THEME: Usar el color onPrimary del tema para el indicador.
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary)
             } else {
                 Icon(
                     imageVector = Icons.Default.QrCodeScanner,
                     contentDescription = "Scanner Icon",
-                    tint = Color.White,
+                    // THEME: Usar el color onPrimary del tema para el ícono principal.
+                    tint = MaterialTheme.colorScheme.surfaceTint,
                     modifier = Modifier.size(120.dp)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = "Panel de Validación",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    // THEME: Usar la tipografía y color del tema.
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = "Presiona el botón para escanear el QR de un cupón y validarlo.",
-                    color = Color.White.copy(alpha = 0.8f),
+                    // THEME: Usar la tipografía y color del tema con menor opacidad.
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
                     textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(32.dp))
+
+                // THEME: Aplicar colores del tema al botón.
                 Button(
                     onClick = {
                         scanner.startScan()
@@ -94,9 +103,16 @@ fun ValidationScreen(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(50.dp)
+                        .height(50.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.onSecondary
+                    )
                 ) {
-                    Text("Escanear QR", fontSize = 18.sp)
+                    Text(
+                        "Escanear QR",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Color.White
+                    )
                 }
             }
         }
@@ -121,7 +137,7 @@ fun ValidationScreen(
 }
 
 /**
- * Un AlertDialog genérico para mostrar el resultado de una operación.
+ * Un AlertDialog genérico para mostrar el resultado de una operación, estilizado con el tema.
  *
  * @param title Título del diálogo.
  * @param message Mensaje principal del diálogo.
@@ -131,11 +147,15 @@ fun ValidationScreen(
 private fun ResultDialog(title: String, message: String, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = title, fontWeight = FontWeight.Bold) },
-        text = { Text(text = message) },
+        // THEME: Aplicar colores del tema al diálogo.
+        containerColor = MaterialTheme.colorScheme.surface,
+        titleContentColor = MaterialTheme.colorScheme.onSurface,
+        textContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        title = { Text(text = title, style = MaterialTheme.typography.headlineSmall) },
+        text = { Text(text = message, style = MaterialTheme.typography.bodyMedium) },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("Aceptar")
+                Text("Aceptar", fontWeight = FontWeight.Bold)
             }
         }
     )

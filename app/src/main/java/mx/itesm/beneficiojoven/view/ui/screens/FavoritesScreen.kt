@@ -72,7 +72,7 @@ fun FavoritesScreen(
                     }
                     error != null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("Error: $error", color = Color.White)
+                            Text("Error: $error", color = MaterialTheme.colorScheme.error)
                             Spacer(Modifier.height(8.dp))
                             Button(onClick = vm::refresh) { Text("Reintentar") }
                         }
@@ -84,18 +84,18 @@ fun FavoritesScreen(
                                 Icon(
                                     imageVector = Icons.Default.FavoriteBorder,
                                     contentDescription = "No hay favoritos",
-                                    tint = Color.White.copy(alpha = 0.7f),
+                                    tint = MaterialTheme.colorScheme.surfaceTint.copy(alpha = 0.7f),
                                     modifier = Modifier.size(64.dp)
                                 )
                                 Spacer(modifier = Modifier.height(16.dp))
                                 Text(
                                     "Aún no tienes cupones favoritos",
-                                    color = Color.White.copy(alpha = 0.9f),
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.9f),
                                     fontSize = 18.sp
                                 )
                                 Text(
                                     "¡Explora el catálogo y guarda los que más te gusten!",
-                                    color = Color.White.copy(alpha = 0.7f)
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                                 )
                             }
                         }
@@ -151,18 +151,18 @@ fun FavoritesScreen(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Atrás",
-                tint = Color.White )
+                tint = MaterialTheme.colorScheme.outlineVariant )
         }
         Icon(
             imageVector = Icons.Default.Favorite,
             contentDescription = "Icono de Favoritos",
-            tint = Color.White,
+            tint = MaterialTheme.colorScheme.outlineVariant,
             modifier = Modifier.size(30.dp).align(Alignment.CenterEnd)
         )
         Spacer(modifier = Modifier.width(12.dp))
         Text(
             text = "Mis Favoritos",
-            color = Color.White,
+            color = MaterialTheme.colorScheme.outlineVariant,
             fontSize = 26.sp,
             fontWeight = FontWeight.Bold
         )

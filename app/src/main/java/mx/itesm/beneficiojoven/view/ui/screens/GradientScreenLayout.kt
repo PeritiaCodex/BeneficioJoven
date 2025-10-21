@@ -15,28 +15,48 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import mx.itesm.beneficiojoven.view.ui.components.LocalBackdropBrush
+import mx.itesm.beneficiojoven.view.ui.theme.LocalExtendedColors
 
 /**
- * Plantilla reutilizable de pantalla con **fondo degradado vertical**.
+ * Archivo que define el layout de pantalla principal con un fondo degradado.
  *
- * Envuelve al [content] y le aplica un `padding` consistente ([contentPadding]).
+ * Proporciona un `CompositionLocal` para que los componentes hijos puedan
+ * acceder a información del fondo, como el `Brush` y los colores.
+ */
+
+/**
+ * `CompositionLocal` que provee la lista de colores (`List<Color>`) utilizada
+ * para crear el fondo degradado. Es útil si un componente hijo necesita
+ * reaccionar o usar los mismos colores del fondo.
+ */
+val LocalBackdropColors = staticCompositionLocalOf { listOf(Color(0xFF84FCEE), Color(0xFF925DFF)) }
+
+/**
+ * `CompositionLocal` que provee la altura total de la pantalla en píxeles.
+ */
+val LocalScreenHeightPx = staticCompositionLocalOf { 0f }
+
+/**
+ * Plantilla reutilizable de pantalla con un **fondo degradado vertical** que
+ * consume los colores desde `LocalExtendedColors` del tema.
+ *
+ * Envuelve al [content] y le aplica un `padding`. Además, provee a sus hijos
+ * el `Brush` del fondo, la lista de colores y la altura de la pantalla a través
+ * de `CompositionLocalProvider`.
  *
  * @param modifier Modificador opcional para el contenedor raíz.
  * @param contentPadding Márgenes internos aplicados al contenido (por defecto `16.dp`).
- * @param content Contenido específico de la pantalla.
+ * @param content Contenido específico de la pantalla que se mostrará sobre el degradado.
  */
-
-
-val LocalBackdropColors = staticCompositionLocalOf { listOf(Color(0xFF9EBCEC), Color(0xFF925DFF)) }
-val LocalScreenHeightPx = staticCompositionLocalOf { 0f }
 @Composable
 fun GradientScreenLayout(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(16.dp),
-    // El contenido específico de la pantalla se pasa como un Composable lambda
     content: @Composable () -> Unit
 ) {
-    val colors = listOf(Color(0xFF9EBCEC), Color(0xFF925DFF))
+    // Usa los colores del tema en lugar de definirlos localmente
+    val extendedColors = LocalExtendedColors.current
+    val colors = listOf(extendedColors.gradientStart, extendedColors.gradientEnd)
     val bgBrush = Brush.verticalGradient(colors)
 
     val conf = LocalConfiguration.current
