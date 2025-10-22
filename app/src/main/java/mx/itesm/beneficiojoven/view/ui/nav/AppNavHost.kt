@@ -55,7 +55,8 @@ fun AppNavHost(nav: NavHostController) {
                     // Por defecto, tras registrarse se va a la pantalla de usuario
                     nav.navigate(Screen.Businesses.route) { popUpTo(0) }
                 },
-                onBack = { nav.popBackStack() }
+                onBack = { nav.popBackStack() },
+                onTerms = { nav.navigate(Screen.Terms.route)}
             )
         }
         composable(Screen.Forgot.route)   { ForgotScreen(onBack = { nav.popBackStack() }) }
