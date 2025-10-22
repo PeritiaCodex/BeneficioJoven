@@ -195,19 +195,6 @@ fun LoginScreen(
 }
 
 /**
- * Pantalla de **recuperación de contraseña** (prototipo).
- *
- * Encapsula un scaffold mínimo con título y botón de navegación atrás.
- *
- * @param onBack Acción de retorno a la pantalla previa.
- */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ForgotScreen(onBack: () -> Unit) {
-    SimpleInfo("Recuperar contraseña (prototipo)", onBack)
-}
-
-/**
  * Utilidad de UI simple para mostrar una pantalla con **TopAppBar** y texto central.
  *
  * @param text Texto a mostrar como título y contenido.
