@@ -1,12 +1,15 @@
 package mx.itesm.beneficiojoven.view.ui.screens
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,9 +27,11 @@ import mx.itesm.beneficiojoven.vm.AuthViewModel
 @Composable
 fun RegisterScreen(
     vm: AuthViewModel,
-    onBack: () -> Unit = {},
-    onRegistered: () -> Unit = {}
+    onBack: () -> Unit,
+    onRegistered: () -> Unit,
+    onTerms: () -> Unit // El parámetro se recibe, no se le asigna un valor por defecto
 ) {
+
     val loading by vm.loading.collectAsState()
     val error by vm.error.collectAsState()
     val user by vm.user.collectAsState()
@@ -49,14 +54,27 @@ fun RegisterScreen(
 
     LaunchedEffect(user) { if (user != null) onRegistered() }
 
-    GradientScreenLayout {
+    GradientScreenLayout(contentPadding = PaddingValues(0.dp)) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(5.dp))
+            // --- CORRECCIÓN: Botón de regreso que usa el callback onBack ---
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp, start = 4.dp)
+            ) {
+                IconButton(onClick = onBack, modifier = Modifier.align(Alignment.CenterStart)) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Regresar",
+                        tint = Color.White
+                    )
+                }
+            }
 
             Image(
                 painter = painterResource(id = R.drawable.logo_sf),
@@ -82,7 +100,7 @@ fun RegisterScreen(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp),
+                    .padding(16.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.scrim.copy(alpha = 0.5f)
                 ),
@@ -184,17 +202,10 @@ fun RegisterScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // --- Texto clickeable de Términos y Condiciones ---
-                    Text(
-                        text = "Términos y Condiciones",
-                        color = MaterialTheme.colorScheme.onTertiary,
-                        fontSize = 14.sp,
-                        textAlign = TextAlign.Center,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier
-                            .clickable { /* TODO: abrir enlace o modal */ }
-                            .padding(vertical = 4.dp)
-                    )
+                    // --- Este botón usa el callback onTerms que le pasa el NavHost ---
+                    TextButton(onClick = onTerms, enabled = !loading) {
+                        Text("Términos y condiciones", color = Color.White)
+                    }
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -235,7 +246,9 @@ fun RegisterScreen(
                         },
                         enabled = formOk,
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.onPrimary
+                            containerColor = MaterialTheme.colorScheme.onPrimary,
+                            disabledContainerColor = Color.Gray.copy(alpha = 0.3f),
+                            disabledContentColor = Color.White.copy(alpha = 0.5f)
                         ),
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -252,6 +265,7 @@ fun RegisterScreen(
 
                     Spacer(modifier = Modifier.height(10.dp))
 
+                    // --- CORRECCIÓN: Este botón ahora usa el callback onBack ---
                     Button(
                         onClick = onBack,
                         colors = ButtonDefaults.buttonColors(
@@ -270,6 +284,6 @@ fun RegisterScreen(
 @Preview
 @Composable
 private fun RegisterScreenPreview() {
-    // Preview sin VM
-    // RegisterScreen(vm = AuthViewModel())
+    // Para que la preview funcione, hay que pasarle todos los callbacks requeridos
+    // RegisterScreen(vm = AuthViewModel(), onBack = {}, onRegistered = {}, onTerms = {})
 }
