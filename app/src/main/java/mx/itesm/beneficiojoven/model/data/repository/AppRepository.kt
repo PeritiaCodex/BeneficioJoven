@@ -70,4 +70,21 @@ interface AppRepository {
      * @return [Result] con el [Coupon] validado o un error si no es válido.
      */
     suspend fun validateCoupon(code: String): Result<Coupon>
+
+    /**
+     * Solicita el restablecimiento de contraseña para un correo electrónico.
+     *
+     * @param email El correo electrónico del usuario.
+     * @return [Result] con Unit en caso de éxito, o un error si falla.
+     */
+    suspend fun requestPasswordReset(email: String): Result<Unit>
+
+    /**
+     * Restablece la contraseña de un usuario usando un token y la nueva contraseña.
+     *
+     * @param token El token de verificación recibido por el usuario.
+     * @param newPassword La nueva contraseña a establecer.
+     * @return [Result] con Unit en caso de éxito, o un error si falla.
+     */
+    suspend fun resetPassword(token: String, newPassword: String): Result<Unit>
 }

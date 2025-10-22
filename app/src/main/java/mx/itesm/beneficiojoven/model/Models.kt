@@ -131,3 +131,8 @@ fun CouponDto.toDomain(): Coupon = Coupon(
     validUntil = valid_until,
     qrUrl = qr_code_url
 )
+
+data class ResetPassword(
+    val token: String,
+    val newPassword: String
+)

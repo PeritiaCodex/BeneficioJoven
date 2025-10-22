@@ -1,5 +1,7 @@
 package mx.itesm.beneficiojoven.model.data.remote
 
+import mx.itesm.beneficiojoven.model.ResetPassword
+import mx.itesm.beneficiojoven.model.User
 import mx.itesm.beneficiojoven.model.data.remote.dto.AuthResponse
 import mx.itesm.beneficiojoven.model.data.remote.dto.CouponDto
 import mx.itesm.beneficiojoven.model.data.remote.dto.LoginReq
@@ -82,4 +84,9 @@ interface BackendApi {
      */
     @GET("joven/{userId}")
     suspend fun getProfile(@Path("userId") userId: String): ProfileDto
+
+    @POST ("auth/request-password-reset")
+    suspend fun requestPasswordReset(@Body body: Map<String, String>): Response<ResponseBody>
+    @POST("auth/reset-password")
+    suspend fun resetPassword(@Body body: ResetPassword): Response<ResponseBody>
 }

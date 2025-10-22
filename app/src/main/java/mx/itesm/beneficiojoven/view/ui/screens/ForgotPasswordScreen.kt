@@ -20,12 +20,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.error
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import mx.itesm.beneficiojoven.R
+import mx.itesm.beneficiojoven.vm.AuthViewModel
 
 // Define los pasos del flujo de recuperación
 private enum class ForgotStep {
@@ -47,6 +50,8 @@ private enum class ForgotStep {
 @Composable
 fun ForgotScreen(
     onBack: () -> Unit,
+    onLoginRedirect: () -> Unit, // Añadido para navegar al login
+    authViewModel: AuthViewModel = viewModel()
 ) {
     // Estado para controlar el paso actual del flujo
     var currentStep by remember { mutableStateOf(ForgotStep.EMAIL) }
@@ -57,9 +62,21 @@ fun ForgotScreen(
     var newPassword by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
 
+    // Estados del ViewModel
+    val loading by authViewModel.loading.collectAsState()
+    val error by authViewModel.error.collectAsState()
+    val resetSuccess by authViewModel.resetSuccess.collectAsState()
+
     // Validaciones
     val passwordsMatch = newPassword.isNotEmpty() && newPassword == confirmPassword
     val isPasswordValid = newPassword.length >= 6
+
+    LaunchedEffect(resetSuccess) {
+        if (resetSuccess) {
+            onLoginRedirect()
+            authViewModel.consumeResetSuccess() // Limpia la señal
+        }
+    }
 
     GradientScreenLayout(contentPadding = PaddingValues(0.dp)) {
         Column(
@@ -158,14 +175,21 @@ fun ForgotScreen(
                                     )
                                     Spacer(modifier = Modifier.height(24.dp))
                                     Button(
-                                        onClick = { currentStep = ForgotStep.CODE },
+                                        onClick = {
+                                            authViewModel.requestPasswordReset(email)
+                                            currentStep = ForgotStep.CODE
+                                        },
                                         modifier = Modifier.fillMaxWidth(),
                                         enabled = email.contains("@") && email.contains("."),
                                         colors = ButtonDefaults.buttonColors(
                                             containerColor = MaterialTheme.colorScheme.onPrimary,
                                             contentColor = Color.White,
-                                            disabledContainerColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.12f),
-                                            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
+                                            disabledContainerColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                                                alpha = 0.12f
+                                            ),
+                                            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                                                alpha = 0.38f
+                                            )
                                         )
                                     ) {
                                         Text("Enviar")
@@ -195,14 +219,20 @@ fun ForgotScreen(
                                     )
                                     Spacer(modifier = Modifier.height(24.dp))
                                     Button(
-                                        onClick = { currentStep = ForgotStep.PASSWORD },
+                                        onClick = {
+                                            currentStep = ForgotStep.PASSWORD
+                                        },
                                         modifier = Modifier.fillMaxWidth(),
                                         enabled = code.length >= 4,
                                         colors = ButtonDefaults.buttonColors(
                                             containerColor = MaterialTheme.colorScheme.onPrimary,
                                             contentColor = Color.White,
-                                            disabledContainerColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.12f),
-                                            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
+                                            disabledContainerColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                                                alpha = 0.12f
+                                            ),
+                                            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                                                alpha = 0.38f
+                                            )
                                         )
                                     ) {
                                         Text("Siguiente")
@@ -250,20 +280,38 @@ fun ForgotScreen(
                                     Spacer(modifier = Modifier.height(24.dp))
                                     Button(
                                         onClick = {
-                                            onBack()
+                                            authViewModel.resetPassword(code, newPassword)
                                         },
                                         modifier = Modifier.fillMaxWidth(),
                                         enabled = isPasswordValid && passwordsMatch,
                                         colors = ButtonDefaults.buttonColors(
                                             containerColor = MaterialTheme.colorScheme.onPrimary,
                                             contentColor = Color.White,
-                                            disabledContainerColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.12f),
-                                            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
+                                            disabledContainerColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                                                alpha = 0.12f
+                                            ),
+                                            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                                                alpha = 0.38f
+                                            )
                                         )
                                     ) {
-                                        Text("Confirmar")
+                                        if (loading) {
+                                            CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                                        } else {
+                                            Text("Confirmar contraseña")
+                                        }
                                     }
                                 }
+                            }
+                            // Muestra el mensaje de error si existe
+                            error?.let {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = it,
+                                    color = MaterialTheme.colorScheme.error,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    textAlign = TextAlign.Center
+                                )
                             }
                         }
                     }

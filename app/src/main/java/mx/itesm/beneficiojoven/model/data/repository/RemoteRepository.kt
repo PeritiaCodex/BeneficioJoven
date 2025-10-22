@@ -8,6 +8,7 @@ import mx.itesm.beneficiojoven.model.data.remote.dto.LoginReq
 import mx.itesm.beneficiojoven.model.data.remote.dto.toDomain
 import android.util.Log
 import mx.itesm.beneficiojoven.model.Coupon
+import mx.itesm.beneficiojoven.model.ResetPassword
 
 /**
  * Implementación remota de [AppRepository] que consume el backend vía Retrofit.
@@ -139,7 +140,30 @@ class RemoteRepository : AppRepository {
         )
     }
 
-    override suspend fun validateCoupon(code: String): Result<Coupon> = runCatching {
-        api.validate(code).toDomain()
+    override suspend fun validateCoupon(code: String): Result<Coupon> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun requestPasswordReset(email: String) = runCatching {
+        val body = mapOf("email" to email)
+        val res = api.requestPasswordReset(body)
+        if (!res.isSuccessful) {
+            val err = res.errorBody()?.string().orEmpty()
+            throw Exception("HTTP ${res.code()}: $err")
+        }
+        // Devuelve Unit en caso de éxito
+    }
+
+    /**
+     * Restablece la contraseña usando el token y la nueva clave.
+     */
+    override suspend fun resetPassword(token: String, newPassword: String) = runCatching {
+        val body = ResetPassword(token = token, newPassword = newPassword)
+        val res = api.resetPassword(body)
+        if (!res.isSuccessful) {
+            val err = res.errorBody()?.string().orEmpty()
+            throw Exception("HTTP ${res.code()}: $err")
+        }
+        // Devuelve Unit en caso de éxito
     }
 }

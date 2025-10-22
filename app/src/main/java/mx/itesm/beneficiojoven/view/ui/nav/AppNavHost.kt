@@ -59,7 +59,19 @@ fun AppNavHost(nav: NavHostController) {
                 onTerms = { nav.navigate(Screen.Terms.route)}
             )
         }
-        composable(Screen.Forgot.route)   { ForgotScreen(onBack = { nav.popBackStack() }) }
+        composable(Screen.Forgot.route)   {
+            ForgotScreen(
+                authViewModel = authVM,
+                onBack = { nav.popBackStack() },
+                onLoginRedirect = {
+                    nav.navigate(Screen.Login.route) {
+                        popUpTo(Screen.Login.route) {
+                            inclusive = true
+                        }
+                    }
+                }
+            )
+        }
         composable(Screen.Terms.route)    { TermsScreen(onBack = { nav.popBackStack() }) }
 
         composable(Screen.Businesses.route) {

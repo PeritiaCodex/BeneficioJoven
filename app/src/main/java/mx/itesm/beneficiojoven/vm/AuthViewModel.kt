@@ -36,6 +36,10 @@ class AuthViewModel(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
+    /** Señal para indicar que el reseteo de contraseña fue exitoso. */
+    private val _resetSuccess = MutableStateFlow(false)
+    val resetSuccess: StateFlow<Boolean> = _resetSuccess
+
     /**
      * Inicia sesión con correo y contraseña.
      *
@@ -81,5 +85,51 @@ class AuthViewModel(
             .onSuccess { _user.value = it }     // ya viene logeado
             .onFailure { _error.value = it.message }
         _loading.value = false
+    }
+
+    /**
+     * Solicita el envío de un token de restablecimiento de contraseña al correo del usuario.
+     *
+     * @param email El correo electrónico para el cual solicitar el restablecimiento.
+     */
+    fun requestPasswordReset(email: String) = viewModelScope.launch {
+        _loading.value = true
+        _error.value = null
+        repo.requestPasswordReset(email)
+            .onSuccess {
+                // La API aceptó la solicitud, no se hace nada más aquí.
+                // La UI es responsable de avanzar al siguiente paso.
+            }
+            .onFailure { _error.value = it.message }
+        _loading.value = false
+    }
+
+    /**
+     * Envía el token (código) y la nueva contraseña para completar el restablecimiento.
+     *
+     * @param token El token recibido por el usuario (generalmente por correo).
+     * @param newPassword La nueva contraseña a establecer.
+     */
+    fun resetPassword(token: String, newPassword: String) = viewModelScope.launch {
+        _loading.value = true
+        _error.value = null
+        repo.resetPassword(token, newPassword)
+            .onSuccess { _resetSuccess.value = true } // Emite el éxito
+            .onFailure { _error.value = it.message }
+        _loading.value = false
+    }
+
+    /**
+     * Limpia el estado de error. Útil para que la UI no muestre errores antiguos.
+     */
+    fun clearError() {
+        _error.value = null
+    }
+
+    /**
+     * Resetea la bandera de éxito para evitar re-navegaciones o efectos no deseados.
+     */
+    fun consumeResetSuccess() {
+        _resetSuccess.value = false
     }
 }
