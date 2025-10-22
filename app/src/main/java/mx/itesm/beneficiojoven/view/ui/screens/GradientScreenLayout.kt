@@ -15,6 +15,8 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import mx.itesm.beneficiojoven.view.ui.components.LocalBackdropBrush
+import mx.itesm.beneficiojoven.view.ui.theme.GradientEnd
+import mx.itesm.beneficiojoven.view.ui.theme.GradientStart
 import mx.itesm.beneficiojoven.view.ui.theme.LocalExtendedColors
 
 /**
@@ -29,7 +31,7 @@ import mx.itesm.beneficiojoven.view.ui.theme.LocalExtendedColors
  * para crear el fondo degradado. Es útil si un componente hijo necesita
  * reaccionar o usar los mismos colores del fondo.
  */
-val LocalBackdropColors = staticCompositionLocalOf { listOf(Color(0xFF84FCEE), Color(0xFF925DFF)) }
+val LocalBackdropColors = staticCompositionLocalOf { listOf(GradientStart, GradientEnd) }
 
 /**
  * `CompositionLocal` que provee la altura total de la pantalla en píxeles.

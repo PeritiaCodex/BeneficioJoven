@@ -17,7 +17,7 @@ val secondary    = Color(0xFF9A2CEC)
 val onSecondary    = Color(0xFF9756CB)
 val surface      = Color(0xFFFA52B4)
 val surfaceTint = Color(0xFFB9F6F8) // íconos
-val onSurface     = Color(0xFFCB72A0)
+val onSurface     = Color(0xFF000000)
 val onSurfaceVariant = Color(0xFF4E4262)
 
 val tertiary       = Color(0xFFFF688B)
@@ -36,8 +36,8 @@ val seeMe     = Color(color = 0xFFFF00E5)
 val outlineVariant  = Color(0xFF7A68FD)
 
 // --- Colores para el degradado del fondo ---
-val GradientStart      = Color(0xFF84FCEE)
-val GradientEnd        = Color(0xFF925DFF)
+val GradientStart      = Color(0xFDFDFDFD)
+val GradientEnd        = Color(0xFFA27EF5) // A27EF5FF
 
 // --- Colores adicionales ---
 val BrownSoft = Color(0xFF8D6E63)

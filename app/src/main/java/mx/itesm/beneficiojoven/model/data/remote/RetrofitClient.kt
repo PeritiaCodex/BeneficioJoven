@@ -38,11 +38,21 @@ object RetrofitClient {
 
     /** Interceptor que agrega el header Authorization si existe token en [Session]. */
     private val authInterceptor = Interceptor { chain ->
+        // 1. Obtiene el token de la sesión global
         val t = Session.token
-        val req = if (t.isNullOrBlank()) chain.request()
-        else chain.request().newBuilder()
-            .addHeader("Authorization", "Bearer $t")
-            .build()
+
+        // 2. Decide qué hacer con la petición
+        val req = if (t.isNullOrBlank()) {
+            // Si NO hay token, deja pasar la petición original sin cambios.
+            chain.request()
+        } else {
+            // Si SÍ hay token, clona la petición y le AÑADE el encabezado.
+            chain.request().newBuilder()
+                .addHeader("Authorization", "Bearer $t")
+                .build()
+        }
+
+        // 3. Procede con la petición (ya sea la original o la modificada).
         chain.proceed(req)
     }
 

@@ -222,7 +222,7 @@ fun CouponCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.25f))
+        colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 1f))
     ) {
         Column {
             Box {
