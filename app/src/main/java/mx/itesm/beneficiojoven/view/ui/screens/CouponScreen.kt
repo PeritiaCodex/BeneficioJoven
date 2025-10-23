@@ -132,13 +132,14 @@ fun CouponScreen(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Atrás",
-                        tint = MaterialTheme.colorScheme.outlineVariant
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(32.dp)
                     )
                 }
                 Text(
                     text = "Cupones Disponibles",
                     style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.outlineVariant
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
                 IconButton(
                     onClick = {
@@ -169,7 +170,7 @@ fun CouponScreen(
                     Icon(
                         imageVector = Icons.Default.Place,
                         contentDescription = "Buscar en mapa",
-                        tint = MaterialTheme.colorScheme.outlineVariant
+                        tint = MaterialTheme.colorScheme.secondary
                     )
                 }
             }
@@ -242,7 +243,7 @@ fun MerchantHeaderCard(name: String, logoUrl: String?) {
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.2f)),
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
@@ -256,9 +257,7 @@ fun MerchantHeaderCard(name: String, logoUrl: String?) {
                 modifier = Modifier
                     .size(50.dp)
                     .background(
-                        MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.25f),
-                        CircleShape
-                    )
+                        MaterialTheme.colorScheme.onTertiary.copy(alpha = 0.25f), CircleShape)
                     .padding(4.dp)
             )
             Spacer(Modifier.width(16.dp))
@@ -266,12 +265,12 @@ fun MerchantHeaderCard(name: String, logoUrl: String?) {
                 Text(
                     "Cupones de:",
                     style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
                 )
                 Text(
                     name,
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.outlineVariant
+                    color = MaterialTheme.colorScheme.outline
                 )
             }
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -284,8 +283,8 @@ fun MerchantHeaderCard(name: String, logoUrl: String?) {
                     checked = isSubscribed,
                     onCheckedChange = { isSubscribed = it },
                     colors = SwitchDefaults.colors(
-                        checkedTrackColor = MaterialTheme.colorScheme.onPrimary,
-                        checkedThumbColor = MaterialTheme.colorScheme.onSecondary
+                        checkedTrackColor = MaterialTheme.colorScheme.secondary,
+                        checkedThumbColor = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.5f)
                     )
                 )
             }
@@ -352,7 +351,7 @@ fun CouponCard(
                             Text(
                                 text = coupon.title,
                                 style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.outlineVariant,
+                                color = MaterialTheme.colorScheme.onSurface,
                                 maxLines = 2,
                                 overflow = TextOverflow.Ellipsis
                             )
@@ -365,7 +364,7 @@ fun CouponCard(
                         Text(
                             text = "Válido hasta: ${coupon.validUntil ?: "N/D"}",
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.secondary
                         )
                     }
                 }
@@ -379,7 +378,7 @@ fun CouponCard(
                     Icon(
                         imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Default.FavoriteBorder,
                         contentDescription = if (isFavorite) "Quitar de Favoritos" else "Guardar Cupón",
-                        tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                        tint = if (isFavorite) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
