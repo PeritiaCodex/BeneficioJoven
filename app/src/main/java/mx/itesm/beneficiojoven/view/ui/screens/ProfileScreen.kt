@@ -1,6 +1,5 @@
 package mx.itesm.beneficiojoven.view.ui.screens
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -8,7 +7,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.LocalOffer
 import androidx.compose.material3.*
@@ -16,13 +14,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import mx.itesm.beneficiojoven.R
-import mx.itesm.beneficiojoven.view.ui.components.GradientButton
 import mx.itesm.beneficiojoven.vm.ProfileViewModel
 
 /**
@@ -56,7 +54,8 @@ fun ProfileScreen(
 
     GradientScreenLayout(contentPadding = PaddingValues(0.dp)) {
         Column(modifier = Modifier.fillMaxSize()) {
-            // --- Barra Superior ---
+
+            // 🔹 Barra superior
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -80,7 +79,7 @@ fun ProfileScreen(
                 Spacer(modifier = Modifier.width(48.dp))
             }
 
-            // --- Contenido Principal ---
+            // 🔸 Contenido principal
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -90,82 +89,72 @@ fun ProfileScreen(
                 verticalArrangement = Arrangement.Center
             ) {
                 when {
-                    loading -> CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                    loading -> CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary)
                     error != null -> Text("Error: $error", color = MaterialTheme.colorScheme.error)
                     else -> {
-                        // --- Imagen de Perfil (fuera de la tarjeta) ---
                         Image(
                             painter = painterResource(id = R.drawable.ic_launcher_foreground),
                             contentDescription = "Foto de perfil",
                             modifier = Modifier
                                 .size(120.dp)
                                 .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.2f))
+                                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
                                 .padding(16.dp),
                             contentScale = ContentScale.Fit
                         )
-                        Spacer(Modifier.height(24.dp))
+                        Spacer(Modifier.height(16.dp))
 
-                        // --- Tarjeta con la Información del Usuario ---
-                        Surface(
-                            shape = CardDefaults.shape,
-                            shadowElevation = 8.dp,
-                            color = MaterialTheme.colorScheme.surface,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 24.dp, horizontal = 16.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(
-                                    text = profile?.fullName ?: "Nombre de usuario",
-                                    style = MaterialTheme.typography.titleLarge,
-                                    color = MaterialTheme.colorScheme.onPrimary,
-                                    textAlign = TextAlign.Center
-                                )
-                                Spacer(Modifier.height(8.dp))
-                                Text(
-                                    text = profile?.email ?: "correo@ejemplo.com",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
-                                    textAlign = TextAlign.Center
-                                )
-                                Spacer(Modifier.height(4.dp))
-                                Text(
-                                    text = profile?.municipality ?: "Municipio",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
-                                    textAlign = TextAlign.Center
-                                )
-                            }
-                        }
+                        Text(
+                            text = profile?.fullName ?: "Nombre de usuario",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = profile?.email ?: "correo@ejemplo.com",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = profile?.municipality ?: "Municipio",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
+                        )
 
                         Spacer(Modifier.height(32.dp))
 
-                        // --- Botones de Acción ---
-//                        GradientButton(
-//                            onClick = { /* TODO: Navegar a pantalla de edición */ },
-//                            modifier = Modifier.fillMaxWidth(),
-//                            enabled = !loading
-//                        ) {
-//                            Text("Editar Perfil")
-//                        }
+                        Button(
+                            onClick = { /* TODO editar perfil */ },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.onPrimary,
+                                contentColor = Color.White
+                            )
+                        ) {
+                            Text(
+                                "Editar perfil"
+                            )
+                        }
 
                         Spacer(Modifier.height(12.dp))
 
-                        GradientButton(
+                        OutlinedButton(
                             onClick = onLogout,
                             modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.onSecondary,
+                                contentColor = Color.White
+                            )
                         ) {
-                            Text("Cerrar sesión", color = MaterialTheme.colorScheme.onSecondary)
+                            Text("Cerrar sesión")
                         }
                     }
                 }
             }
 
-            // --- Menú Inferior Restaurado ---
+            // 🔹 Menú inferior
             BottomMenu(
                 onOpenFavorites = onOpenFavorites,
                 onOpenCoupons = onOpenCoupons,
@@ -176,7 +165,11 @@ fun ProfileScreen(
 }
 
 /**
- * Barra de navegación inferior con accesos a Tarjeta, Favoritos, Cupones y Perfil.
+ * Barra de navegación inferior con accesos a Favoritos, Cupones y Perfil.
+ *
+ * @param onOpenFavorites Acción para navegar a la pantalla de favoritos.
+ * @param onOpenCoupons Acción para navegar a la pantalla de cupones.
+ * @param onOpenProfile Acción para navegar a la pantalla de perfil.
  */
 @Composable
 private fun BottomMenu(
@@ -193,19 +186,11 @@ private fun BottomMenu(
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = { /* TODO: Acción para Tarjeta */ }) {
-            Icon(
-                imageVector = Icons.Default.CreditCard,
-                contentDescription = "Tarjeta",
-                tint = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.size(32.dp)
-            )
-        }
         IconButton(onClick = onOpenFavorites) {
             Icon(
                 imageVector = Icons.Default.Favorite,
                 contentDescription = "Favoritos",
-                tint = MaterialTheme.colorScheme.onSurface,
+                tint = MaterialTheme.colorScheme.surfaceTint,
                 modifier = Modifier.size(32.dp)
             )
         }
@@ -213,7 +198,7 @@ private fun BottomMenu(
             Icon(
                 imageVector = Icons.Default.LocalOffer,
                 contentDescription = "Cupones",
-                tint = MaterialTheme.colorScheme.onSurface,
+                tint = MaterialTheme.colorScheme.surfaceTint,
                 modifier = Modifier.size(32.dp)
             )
         }
@@ -221,7 +206,7 @@ private fun BottomMenu(
             Icon(
                 imageVector = Icons.Default.AccountCircle,
                 contentDescription = "Usuario",
-                tint = MaterialTheme.colorScheme.onSurface,
+                tint = MaterialTheme.colorScheme.surfaceTint,
                 modifier = Modifier.size(32.dp)
             )
         }

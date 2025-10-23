@@ -19,7 +19,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import mx.itesm.beneficiojoven.view.ui.theme.LocalExtendedColors
 import mx.itesm.beneficiojoven.vm.CouponListVM
 import mx.itesm.beneficiojoven.vm.FavoritesVM
 
@@ -140,14 +139,11 @@ fun FavoritesScreen(
  */
 @Composable fun FavoritesHeader(
     onBack: () -> Unit
-) {
-    val diagonalGradient = LocalExtendedColors.current.diagonalGradientBrush
-
-
+) { // <-- Acepta el parámetro onBack
     Spacer(Modifier.height(16.dp))
-    Box(
+    Box( // <-- Se cambia Row por Box para alinear elementos
         modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
-    ) {
+    ) { // Botón de "Atrás" alineado al inicio
         IconButton( onClick = onBack,
             modifier = Modifier
                 .align(Alignment.CenterStart)
@@ -155,20 +151,18 @@ fun FavoritesScreen(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Atrás",
-                tint = MaterialTheme.colorScheme.secondary )
+                tint = MaterialTheme.colorScheme.outlineVariant )
         }
         Icon(
             imageVector = Icons.Default.Favorite,
             contentDescription = "Icono de Favoritos",
-            tint = MaterialTheme.colorScheme.secondary.copy(alpha = 0.75f),
+            tint = MaterialTheme.colorScheme.outlineVariant,
             modifier = Modifier.size(30.dp).align(Alignment.CenterEnd)
         )
         Spacer(modifier = Modifier.width(12.dp))
         Text(
             text = "Mis Favoritos",
-            style = MaterialTheme.typography.headlineSmall.copy(
-                brush = diagonalGradient
-            ),
+            color = MaterialTheme.colorScheme.outlineVariant,
             fontSize = 26.sp,
             fontWeight = FontWeight.Bold
         )
