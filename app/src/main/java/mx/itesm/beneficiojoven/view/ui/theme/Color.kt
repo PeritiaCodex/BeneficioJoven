@@ -3,17 +3,42 @@ package mx.itesm.beneficiojoven.view.ui.theme
 import androidx.compose.ui.graphics.Color
 
 /**
- * Archivo que centraliza colores personalizados que no forman parte del
- * Material Theme principal, como los colores para un fondo degradado.
+ * Archivo que centraliza la paleta de colores de la aplicación.
+ *
+ * Define los colores utilizados en el tema de Material Design y los colores
+ * personalizados para componentes específicos, como el fondo degradado.
  */
 
-// --- Colores para el degradado del fondo ---
-// Estos se manejarán por separado a través de ExtendedColors
-val GradientStart = Color(0xFFB299F5) // Usando el morado como inicio del gradiente
-val GradientEnd = Color(0xFFF1F2F4)   // Usando el azul como fin del gradiente
+// --- Colores para el tema de la App ---
+val primary     = Color(0xFF0662FA)
+val onPrimary = Color(0xFF4663E8)
 
-// --- Colores Adicionales (si fueran necesarios) ---
-// Estos colores no son parte del tema y se usarían para casos muy específicos.
+val secondary    = Color(0xFF9A2CEC)
+val onSecondary    = Color(0xFF9756CB)
+val surface      = Color(0xFFFA52B4)
+val surfaceTint = Color(0xFFB9F6F8) // íconos
+val onSurface     = Color(0xFF000000)
+val onSurfaceVariant = Color(0xFF4E4262)
+
+val tertiary       = Color(0xFFFF688B)
+val onTertiary     = Color(color = 0xFFFD727D)
+
+val error = Color(0xFFFF0474)
+
+
+val primaryContainer = Color(0xFFC2E2EB)
+
+
+
+val seeMe     = Color(color = 0xFFFF00E5)
+
+
+val outlineVariant  = Color(0xFF7A68FD)
+
+// --- Colores para el degradado del fondo ---
+val GradientStart      = Color(0xFDFDFDFD)
+val GradientEnd        = Color(0xFFA27EF5) // A27EF5FF
+
+// --- Colores adicionales ---
 val BrownSoft = Color(0xFF8D6E63)
 val GreenAccent = Color(0xFF1B5E20)
-val SeeMe = Color(0xFFFF00E5)

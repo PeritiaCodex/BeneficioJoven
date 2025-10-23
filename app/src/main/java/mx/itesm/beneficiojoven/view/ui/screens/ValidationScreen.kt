@@ -32,7 +32,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
-import mx.itesm.beneficiojoven.view.ui.components.GradientButton
 import mx.itesm.beneficiojoven.view.ui.components.GradientScreenLayout
 import mx.itesm.beneficiojoven.vm.ValidationViewModel
 
@@ -90,7 +89,7 @@ fun ValidationScreen(
                 Spacer(modifier = Modifier.height(32.dp))
 
                 // THEME: Aplicar colores del tema al botón.
-                GradientButton (
+                Button(
                     onClick = {
                         scanner.startScan()
                             .addOnSuccessListener { barcode ->
@@ -104,7 +103,10 @@ fun ValidationScreen(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(50.dp)
+                        .height(50.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.onSecondary
+                    )
                 ) {
                     Text(
                         "Escanear QR",
@@ -145,7 +147,7 @@ fun ValidationScreen(
 private fun ResultDialog(title: String, message: String, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
-
+        // THEME: Aplicar colores del tema al diálogo.
         containerColor = MaterialTheme.colorScheme.surface,
         titleContentColor = MaterialTheme.colorScheme.onSurface,
         textContentColor = MaterialTheme.colorScheme.onSurfaceVariant,

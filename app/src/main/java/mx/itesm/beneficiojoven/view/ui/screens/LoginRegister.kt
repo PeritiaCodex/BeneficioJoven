@@ -1,28 +1,24 @@
 package mx.itesm.beneficiojoven.view.ui.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import mx.itesm.beneficiojoven.R
 import mx.itesm.beneficiojoven.model.User
-import mx.itesm.beneficiojoven.view.ui.components.GradientButton
 import mx.itesm.beneficiojoven.vm.AuthViewModel
 
 /**
@@ -60,9 +56,8 @@ fun LoginScreen(
     GradientScreenLayout {
         Column(
             modifier = Modifier
-                .padding(horizontal = 24.dp, vertical = 16.dp) // Ajuste de padding
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
+                .padding(24.dp)
+                .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -75,45 +70,33 @@ fun LoginScreen(
                     .padding(bottom = 8.dp)
             )
 
-            Text(
-                text = buildAnnotatedString {
-                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                        append("BENEFICIO")
-                    }
-                    append(" JOVEN")
-                },
-                color = MaterialTheme.colorScheme.onPrimary,
-                style = MaterialTheme.typography.headlineSmall
-            )
+            Text("BENEFICIO JOVEN", color = Color.White, fontSize = 22.sp)
 
             Spacer(Modifier.height(24.dp))
 
             Surface(
                 shape = CardDefaults.shape,
                 shadowElevation = 8.dp,
-                color = MaterialTheme.colorScheme.surface,
-                modifier = Modifier.fillMaxWidth()
+                color = MaterialTheme.colorScheme.scrim.copy(alpha = 0.2f),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp)
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.padding(24.dp)
                 ) {
-                    Text(
-                        "Login",
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        style = MaterialTheme.typography.headlineSmall
-                    )
+                    Text("Login", color = Color.White, fontSize = 20.sp)
                     Spacer(Modifier.height(16.dp))
 
                     val textFieldColors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f),
-                        focusedTextColor = MaterialTheme.colorScheme.onPrimary,
-                        unfocusedTextColor = MaterialTheme.colorScheme.onPrimary,
-                        focusedLabelColor = MaterialTheme.colorScheme.onPrimary,
-                        unfocusedLabelColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
-                        cursorColor = MaterialTheme.colorScheme.primary,
-                        errorBorderColor = MaterialTheme.colorScheme.error
+                        focusedBorderColor = MaterialTheme.colorScheme.tertiary,
+                        unfocusedBorderColor = Color.Gray,
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        focusedLabelColor = MaterialTheme.colorScheme.onTertiary,
+                        unfocusedLabelColor = Color.LightGray,
+                        cursorColor = MaterialTheme.colorScheme.tertiary,
                     )
 
                     OutlinedTextField(
@@ -151,28 +134,25 @@ fun LoginScreen(
                             onCheckedChange = { keepSession = it },
                             enabled = !loading,
                             colors = CheckboxDefaults.colors(
-                                checkedColor = MaterialTheme.colorScheme.secondary,
-                                uncheckedColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
+                                checkedColor = MaterialTheme.colorScheme.onPrimary,
+                                uncheckedColor = Color.LightGray,
                                 checkmarkColor = MaterialTheme.colorScheme.onSecondary
                             )
                         )
-
-                        Text(
-                            "Mantener la sesión iniciada",
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
+                        Text("Mantener la sesión iniciada", color = Color.White, fontSize = 14.sp)
                     }
 
                     Spacer(Modifier.height(12.dp))
 
-                    GradientButton(
+                    Button(
                         onClick = { vm.login(email.trim(), password) },
                         modifier = Modifier.fillMaxWidth(),
-                        enabled = !loading
-                    ) {
-                        Text(if (loading) "Entrando..." else "Login")
-                    }
+                        enabled = !loading,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.onPrimary,
+                            contentColor = Color.White
+                        )
+                    ) { Text(if (loading) "Entrando..." else "Login") }
 
                     Spacer(Modifier.height(8.dp))
 
@@ -181,26 +161,20 @@ fun LoginScreen(
                         modifier = Modifier.fillMaxWidth(),
                         enabled = !loading,
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.secondary,
-                            contentColor = MaterialTheme.colorScheme.onSecondary,
-                            disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
-                            disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                            containerColor = MaterialTheme.colorScheme.onSecondary,
+                            contentColor = Color.White
                         )
                     ) { Text("Registrarse") }
 
                     Spacer(Modifier.height(8.dp))
 
                     TextButton(onClick = onForgot, enabled = !loading) {
-                        Text("¿Olvidaste tu contraseña?", color = MaterialTheme.colorScheme.primary)
+                        Text("¿Olvidaste tu contraseña?", color = Color.White)
                     }
 
                     if (error != null) {
                         Spacer(Modifier.height(8.dp))
-                        Text(
-                            "Error: $error",
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodySmall
-                        )
+                        Text("Error: $error", color = MaterialTheme.colorScheme.error)
                     }
                 }
             }
@@ -208,8 +182,42 @@ fun LoginScreen(
             Spacer(Modifier.height(12.dp))
 
             TextButton(onClick = onTerms, enabled = !loading) {
-                Text("Términos y condiciones", color = MaterialTheme.colorScheme.primary)
+                Text("Términos y condiciones", color = Color.White)
             }
         }
+
+        if (loading) {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+            }
+        }
+    }
+}
+
+/**
+ * Utilidad de UI simple para mostrar una pantalla con **TopAppBar** y texto central.
+ *
+ * @param text Texto a mostrar como título y contenido.
+ * @param onBack Acción de navegación hacia atrás.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SimpleInfo(
+    text: String,
+    onBack: () -> Unit
+) {
+    Scaffold(
+        topBar =
+            {
+                TopAppBar(
+                    title = { Text(text) },
+                    navigationIcon = { TextButton(onClick = onBack) { Text("Atrás") } })
+            }) { innerPadding ->
+        Box(
+            Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+            contentAlignment = Alignment.Center
+        ) { Text(text) }
     }
 }
