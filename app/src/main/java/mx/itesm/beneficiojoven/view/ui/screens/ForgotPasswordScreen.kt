@@ -123,7 +123,7 @@ fun ForgotScreen(
             Surface(
                 shape = CardDefaults.shape,
                 shadowElevation = 8.dp,
-                color = MaterialTheme.colorScheme.scrim.copy(alpha = 0.2f),
+                color = MaterialTheme.colorScheme.surface,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp) // Padding exterior para separar el contenedor de los bordes

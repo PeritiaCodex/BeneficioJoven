@@ -32,6 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
+import mx.itesm.beneficiojoven.view.ui.components.GradientButton
 import mx.itesm.beneficiojoven.view.ui.components.GradientScreenLayout
 import mx.itesm.beneficiojoven.vm.ValidationViewModel
 
@@ -61,35 +62,30 @@ fun ValidationScreen(
             verticalArrangement = Arrangement.Center
         ) {
             if (isLoading) {
-                // THEME: Usar el color onPrimary del tema para el indicador.
                 CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary)
             } else {
                 Icon(
                     imageVector = Icons.Default.QrCodeScanner,
                     contentDescription = "Scanner Icon",
-                    // THEME: Usar el color onPrimary del tema para el ícono principal.
                     tint = MaterialTheme.colorScheme.surfaceTint,
                     modifier = Modifier.size(120.dp)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = "Panel de Validación",
-                    // THEME: Usar la tipografía y color del tema.
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.onPrimary
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = "Presiona el botón para escanear el QR de un cupón y validarlo.",
-                    // THEME: Usar la tipografía y color del tema con menor opacidad.
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
                     textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // THEME: Aplicar colores del tema al botón.
-                Button(
+                GradientButton (
                     onClick = {
                         scanner.startScan()
                             .addOnSuccessListener { barcode ->
@@ -103,10 +99,7 @@ fun ValidationScreen(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(50.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.onSecondary
-                    )
+                        .height(50.dp)
                 ) {
                     Text(
                         "Escanear QR",
@@ -147,7 +140,7 @@ fun ValidationScreen(
 private fun ResultDialog(title: String, message: String, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        // THEME: Aplicar colores del tema al diálogo.
+
         containerColor = MaterialTheme.colorScheme.surface,
         titleContentColor = MaterialTheme.colorScheme.onSurface,
         textContentColor = MaterialTheme.colorScheme.onSurfaceVariant,

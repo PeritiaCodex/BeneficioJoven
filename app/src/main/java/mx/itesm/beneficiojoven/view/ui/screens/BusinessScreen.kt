@@ -34,6 +34,7 @@ import coil.compose.AsyncImage
 import mx.itesm.beneficiojoven.view.ui.components.AutoResizeText
 import mx.itesm.beneficiojoven.view.ui.components.LiquidGlassCard
 import mx.itesm.beneficiojoven.view.ui.rememberAppImageLoader
+import mx.itesm.beneficiojoven.view.ui.theme.LocalExtendedColors
 import mx.itesm.beneficiojoven.vm.CouponListVM
 
 /**
@@ -104,7 +105,7 @@ fun BusinessesScreen(
             Box(modifier = Modifier.weight(1f)) {
                 when {
                     loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(color = MaterialTheme.colorScheme.onSecondary)
+                        CircularProgressIndicator(color = MaterialTheme.colorScheme.secondary)
                     }
                     error != null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -161,7 +162,10 @@ fun BusinessesScreen(
  */
 @Composable
 fun Header() {
+    val diagonalGradient = LocalExtendedColors.current.diagonalGradientBrush
+
     Spacer(Modifier.height(16.dp))
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center,
@@ -169,9 +173,10 @@ fun Header() {
     ) {
         Text(
             text = "Catálogo de Negocios",
-            color = MaterialTheme.colorScheme.outlineVariant,
-            fontSize = 26.sp,
-            fontWeight = FontWeight.Bold
+            style = MaterialTheme.typography.headlineSmall.copy( // Usamos un estilo base del tema
+                brush = diagonalGradient, // Se aplica el gradiente
+                fontWeight = FontWeight.Bold // Se aplica la negrita
+            )
         )
     }
 }
@@ -191,7 +196,7 @@ fun FilterBar(
     onFilterClick: (String) -> Unit
 ) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.65f)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.5f)),
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
@@ -253,11 +258,9 @@ fun ExpandedFiltersPanel(
     // Altura de todas las filas + altura de todos los espaciados entre ellas.
     val gridHeight = (rowHeight * rowCount) + (verticalSpacing * (rowCount - 1))
 
-    // --- FIN DE LA MODIFICACIÓN ---
-
     AnimatedVisibility(visible = visible) {
         Card(
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onSecondary.copy(alpha = .5f)),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiary.copy(alpha = .25f)),
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.medium.copy(topStart = CornerSize(0), topEnd = CornerSize(0))
         ) {
@@ -283,7 +286,7 @@ fun ExpandedFiltersPanel(
                     onClick = onClearFilters,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 ) {
-                    Text("Limpiar filtros", color = MaterialTheme.colorScheme.onPrimary)
+                    Text("Limpiar filtros", color = MaterialTheme.colorScheme.secondary)
                 }
                 Spacer(Modifier.height(8.dp))
             }
@@ -305,8 +308,8 @@ fun FilterChip(
     modifier: Modifier = Modifier,
     isSelected: Boolean = false
 ) {
-    val borderColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
-    val backgroundColor = if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.3f) else MaterialTheme.colorScheme.surfaceTint
+    val borderColor = if (isSelected) MaterialTheme.colorScheme.tertiary else Color.Transparent
+    val backgroundColor = if (isSelected) MaterialTheme.colorScheme.surfaceTint else MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.3f)
 
     Surface(
         color = backgroundColor,
@@ -323,7 +326,7 @@ fun FilterChip(
             AutoResizeText(
                 text = label,
                 style = MaterialTheme.typography.labelMedium.copy(textAlign = TextAlign.Center),
-                color = MaterialTheme.colorScheme.outlineVariant,
+                color = MaterialTheme.colorScheme.onSecondary,
                 modifier = Modifier
             )
         }
@@ -356,11 +359,11 @@ fun BusinessCard(
             .clickable { onClick() },
         shape = RoundedCornerShape(22.dp),
         cornerRadius = 22.dp,
-        blurRadius = 18.dp,
-        tintAlpha = 0.04f,
-        backdropAlpha = 0.95f,
-        borderAlpha = 0.22f,
-        highlightAlpha = 0.10f
+        blurRadius = 24.dp,
+        tintAlpha = 0.25f,
+        backdropAlpha = 0.60f,
+        borderAlpha = 0.35f,
+        highlightAlpha = 0.15f
     ) {
         Row(
             modifier = Modifier
@@ -386,13 +389,13 @@ fun BusinessCard(
                     Text(
                         text = title,
                         style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onSecondary,
+                        color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.weight(1f, fill = false)
                     )
                     Text(
                         text = type,
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary,
+                        color = MaterialTheme.colorScheme.secondary,
                         textAlign = TextAlign.End,
                         modifier = Modifier.padding(start = 8.dp)
                     )
@@ -431,7 +434,7 @@ fun BottomMenu(
             Icon(
                 imageVector = Icons.Default.Favorite,
                 contentDescription = "Favoritos",
-                tint = MaterialTheme.colorScheme.surfaceTint,
+                tint = MaterialTheme.colorScheme.onPrimaryContainer,
                 modifier = Modifier.size(32.dp)
             )
         }
@@ -439,7 +442,7 @@ fun BottomMenu(
             Icon(
                 imageVector = Icons.Default.LocalOffer,
                 contentDescription = "Cupones",
-                tint = MaterialTheme.colorScheme.surfaceTint,
+                tint = MaterialTheme.colorScheme.onPrimaryContainer,
                 modifier = Modifier.size(32.dp)
             )
         }
@@ -447,7 +450,7 @@ fun BottomMenu(
             Icon(
                 imageVector = Icons.Default.AccountCircle,
                 contentDescription = "Usuario",
-                tint = MaterialTheme.colorScheme.surfaceTint,
+                tint = MaterialTheme.colorScheme.onPrimaryContainer,
                 modifier = Modifier.size(32.dp)
             )
         }

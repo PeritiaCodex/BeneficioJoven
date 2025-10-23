@@ -1,95 +1,105 @@
 package mx.itesm.beneficiojoven.view.ui.theme
 
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 
-/**
- * Estructura de datos para proveer colores personalizados más allá de los
- * que ofrece MaterialTheme, como los colores para un fondo degradado.
- *
- * @property gradientStart Color de inicio del degradado.
- * @property gradientEnd Color de fin del degradado.
- */
+// --- Definición de la Paleta de Colores Extendida ---
 data class ExtendedColors(
     val gradientStart: Color,
-    val gradientEnd: Color
+    val gradientEnd: Color,
+    val diagonalGradientBrush: Brush
 )
 
-/**
- * `CompositionLocal` para acceder a la paleta de `ExtendedColors` definida
- * en el tema, permitiendo que cualquier Composable anidado pueda usarla.
- */
 val LocalExtendedColors = staticCompositionLocalOf {
     ExtendedColors(
         gradientStart = Color.Unspecified,
-        gradientEnd = Color.Unspecified
+        gradientEnd = Color.Unspecified,
+        diagonalGradientBrush = Brush.horizontalGradient()
     )
 }
 
-// Paleta de colores para el tema claro
-private val LightColorScheme: ColorScheme = lightColorScheme(
-    primary = primary,
-    onPrimary = onPrimary,
-    surface = surface,
-    surfaceTint = surfaceTint,
-    onSurface = onSurface,
-    onSurfaceVariant = onSurfaceVariant,
-    secondary = secondary,
-    onSecondary = onSecondary,
-    tertiary = tertiary,
-    onTertiary = onTertiary,
-    outlineVariant = outlineVariant,
+// --- Paleta de Colores para el Tema Claro (Light Theme) ---
+private val LightColorScheme = lightColorScheme(
+    //---Contenedores principales---
+    primaryContainer = Color(0xFFEBE7F4), // Tono claro de `primary` para contenedores.
+    onPrimaryContainer = Color(0xFF825CB1),// Texto/iconos sobre `primaryContainer`.
 
-    primaryContainer = primaryContainer,
+    // Primarios
+    primary = Color(0xFF1C2532),           // Boton moradillo''
+    onPrimary = Color(0xFF1C2532),               // Texto/iconos sobre 'primary'. Se recomienda blanco para contraste.
 
-    error = error
+    // Botón Interactivo
+    secondary = Color(0xFF62419A),         // Tu 'logo 3', para acentos y FABs.
+    onSecondary = Color.White,             // Texto/iconos sobre 'secondary'.
+
+    // Roles Terciarios
+    tertiary = Color(0xFFE8ACFD),          // Tu 'tertiary', para balance o atención.
+    onTertiary = Color(0xFFE0BEFF),              // Texto/iconos sobre 'tertiary'.
+
+    // Roles de Error
+    error = Color(0xFFD35090),
+    onError = Color.White,
+
+    // Roles de Superficie y Fondo
+    background = Color(0xFFF1F2F4),        // El color de fondo general de la app.
+    onBackground = Color(0xFF1F2937),      // Texto sobre el fondo.
+
+    surface = Color(0xFFFFFFFF),           // Color para Cards, Sheets, Menus. Blanco es lo estándar.
+    onSurface = Color(0xFF1F2937),         // Título , color principal de texto sobre 'surface'.
+    onSurfaceVariant = Color(0xFF374050),   // Subtítulo', para texto con menor énfasis.
+
+    surfaceTint = Color(0xFF6F3878),       // Usa el color primario para la elevación tonal.
+    outline = Color(0xFF7A68FD),           // Tu 'outlineVariant', para bordes con contraste.
+    scrim = Color.Black                    // Color estándar para oscurecer contenido.
 )
 
-// Paleta de colores para el tema oscuro (puedes personalizarla después)
-private val DarkColorScheme: ColorScheme = darkColorScheme()
+// TODO: Definir una paleta de colores coherente para el Tema Oscuro.
+private val DarkColorScheme = darkColorScheme(
+    primary = Color(0xFFD0BCFF),
+    onPrimary = Color(0xFF381E72),
+    secondary = Color(0xFFCCC2DC),
+    onSecondary = Color(0xFF332D41),
+    tertiary = Color(0xFFEFB8C8),
+    onTertiary = Color(0xFF492532),
+    background = Color(0xFF1C1B1F),
+    onBackground = Color(0xFFE6E1E5),
+    surface = Color(0xFF1C1B1F),
+    onSurface = Color(0xFFE6E1E5)
+)
 
 /**
  * Tema principal de la aplicación BeneficioJoven.
- *
- * Aplica el `MaterialTheme` y, además, provee una paleta de colores extendida
- * (`ExtendedColors`) a través de `CompositionLocalProvider` para componentes
- * personalizados como el fondo degradado.
- *
- * @param darkTheme Indica si se debe usar el esquema de colores oscuro. Por defecto, usa el del sistema.
- * @param dynamicColor Habilita el uso de colores dinámicos en Android 12+. Deshabilitado por defecto.
- * @param content El contenido Composable al que se le aplicará el tema.
  */
 @Composable
 fun BeneficioJovenTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val colorScheme =
-        if (darkTheme) {
-            DarkColorScheme
-        } else {
-            LightColorScheme
-        }
+    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
-    // Define los valores para los colores del degradado
+    // Define y provee los colores personalizados para el gradiente
     val extendedColors = ExtendedColors(
         gradientStart = GradientStart,
-        gradientEnd = GradientEnd
+        gradientEnd = GradientEnd,
+        diagonalGradientBrush = Brush.linearGradient(
+            colors = listOf(
+                Color(0xFF3f63a0),
+                Color(0xFF5b53a3),
+                Color(0xFF6b47a7)
+            ),
+            start = Offset(0f, Float.POSITIVE_INFINITY), // Bottom-Left
+            end = Offset(Float.POSITIVE_INFINITY, 0f)    // Top-Right
+        )
     )
 
-    // Provee los colores del degradado al resto de la app
     CompositionLocalProvider(LocalExtendedColors provides extendedColors) {
         MaterialTheme(
             colorScheme = colorScheme,
