@@ -87,4 +87,8 @@ interface AppRepository {
      * @return [Result] con Unit en caso de éxito, o un error si falla.
      */
     suspend fun resetPassword(token: String, newPassword: String): Result<Unit>
+
+    suspend fun updateFcmToken(fcmToken: String): Result<Unit>
+
+    suspend fun toggleSubscription(merchantId: String): Result<Any>
 }

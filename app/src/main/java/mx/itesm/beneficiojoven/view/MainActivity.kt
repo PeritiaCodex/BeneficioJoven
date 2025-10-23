@@ -73,7 +73,6 @@ class MainActivity : ComponentActivity() {
         }
 
         solicitarPermiso()
-        obtenerToken()
 
         setContent {
             BeneficioJovenTheme {
@@ -94,14 +93,4 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-private fun obtenerToken() {
-    FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
-        if (!task.isSuccessful) {
-            println("Error al obtener el token: ${task.exception}")
-            return@OnCompleteListener
-        }
-        val token = task.result
-        println("FCM TOKEN: $token")
-    })
-}
 }

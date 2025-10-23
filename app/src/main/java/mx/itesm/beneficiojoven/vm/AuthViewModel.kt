@@ -132,4 +132,18 @@ class AuthViewModel(
     fun consumeResetSuccess() {
         _resetSuccess.value = false
     }
+
+    /**
+     * Envía el token de Firebase Cloud Messaging (FCM) al backend para registrar el dispositivo
+     * para notificaciones push.
+     * Esta función está diseñada para ser llamada una vez que el usuario ha iniciado sesión.
+     *
+     * @param fcmToken El token generado por Firebase.
+     */
+    fun sendFcmToken(fcmToken: String) = viewModelScope.launch {
+        repo.updateFcmToken(fcmToken)
+            .onFailure {
+                println("Error al actualizar el token FCM: ${it.message}")
+            }
+    }
 }

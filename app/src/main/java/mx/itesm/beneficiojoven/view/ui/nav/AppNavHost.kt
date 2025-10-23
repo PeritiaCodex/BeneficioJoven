@@ -5,6 +5,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.google.firebase.messaging.FirebaseMessaging
 import mx.itesm.beneficiojoven.model.Role
 import mx.itesm.beneficiojoven.view.ui.screens.*
 import mx.itesm.beneficiojoven.vm.AuthViewModel
@@ -37,6 +38,15 @@ fun AppNavHost(nav: NavHostController) {
             LoginScreen(
                 vm = authVM,
                 onLogged = { user ->
+                    FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            val token = task.result
+                            println("FCM TOKEN OBTENIDO: $token")
+                            authVM.sendFcmToken(token)
+                        } else {
+                            println("Error al obtener el token FCM: ${task.exception}")
+                        }
+                    }
                     val destination = when (user.role) {
                         Role.ADMIN, Role.MERCHANT -> Screen.Validation.route
                         else -> Screen.Businesses.route

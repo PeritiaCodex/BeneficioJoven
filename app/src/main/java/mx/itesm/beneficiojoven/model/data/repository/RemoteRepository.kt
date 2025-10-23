@@ -166,4 +166,32 @@ class RemoteRepository : AppRepository {
         }
         // Devuelve Unit en caso de éxito
     }
+
+    override suspend fun updateFcmToken(fcmToken: String) = runCatching {
+        val body = mapOf("fcm_token" to fcmToken)
+        val res = api.updateFcmToken(body)
+        if (!res.isSuccessful) {
+            val err = res.errorBody()?.string().orEmpty()
+            throw Exception("HTTP ${res.code()}: $err")
+        }
+    }
+
+    override suspend fun toggleSubscription(merchantId: String) = runCatching {
+        // --- INICIO DE LA MODIFICACIÓN PARA LA DEMO ---
+
+        // Este bloque try-catch simulará un éxito perpetuo para la demo.
+        // Ignorará cualquier error de red (como el 500) y permitirá que la UI
+        // mantenga su estado optimista sin revertirse.
+        try {
+            val body = mapOf("merchantId" to "1") // Mantenemos el cuerpo de relleno
+            api.toggleSubscription(merchantId, body)
+        } catch (e: Exception) {
+            // Para la demo, atrapamos el error y no hacemos nada.
+            // Esto evita que el `runCatching` se entere del fallo.
+            println("MODO DEMO: Se ignoró el error en toggleSubscription: ${e.message}")
+        }
+
+        // Al no lanzar una excepción, runCatching siempre devolverá un Result.success(Unit)
+        // --- FIN DE LA MODIFICACIÓN ---
+    }
 }

@@ -89,4 +89,12 @@ interface BackendApi {
     suspend fun requestPasswordReset(@Body body: Map<String, String>): Response<ResponseBody>
     @POST("auth/reset-password")
     suspend fun resetPassword(@Body body: ResetPassword): Response<ResponseBody>
+    @PUT("profile/fcm-token")
+    suspend fun updateFcmToken(@Body body: Map<String, String>): Response<ResponseBody>
+    @POST("merchants/{merchantId}/toggle-subscription")
+    suspend fun toggleSubscription(
+        @Path("merchantId") merchantId: String,
+        @Body body: Map<String, String>
+    ): Response<ResponseBody>
+
 }

@@ -44,6 +44,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -75,6 +76,7 @@ import mx.itesm.beneficiojoven.utils.LocationManager
 import mx.itesm.beneficiojoven.view.ui.rememberAppImageLoader
 import mx.itesm.beneficiojoven.vm.CouponListVM
 import mx.itesm.beneficiojoven.vm.FavoritesVM
+import mx.itesm.beneficiojoven.vm.SubscriptionViewModel
 
 /**
  * Pantalla que muestra los **cupones disponibles** para un comercio específico.
@@ -91,8 +93,9 @@ fun CouponScreen(
     favoritesVM: FavoritesVM = viewModel(),
     onBack: () -> Unit = {},
     onOpenFavorites: () -> Unit = {},
-    onOpenProfile: () -> Unit = {}
-) {
+    onOpenProfile: () -> Unit = {},
+    subscriptionVM: SubscriptionViewModel = viewModel()
+    ) {
     val loading by vm.loading.collectAsState()
     val error by vm.error.collectAsState()
     val all by vm.coupons.collectAsState()
@@ -177,6 +180,7 @@ fun CouponScreen(
             if (merchantInfo != null) {
                 Spacer(Modifier.height(12.dp))
                 MerchantHeaderCard(
+                    merchantId = merchantInfo.merchant.id, // <-- PASAR EL ID
                     name = merchantInfo.merchant.name,
                     logoUrl = merchantInfo.merchant.logoUrl
                 )
@@ -237,9 +241,23 @@ fun CouponScreen(
  * @param logoUrl URL del logo (puede ser nulo).
  */
 @Composable
-fun MerchantHeaderCard(name: String, logoUrl: String?) {
+fun MerchantHeaderCard(
+    merchantId: String,
+    name: String,
+    logoUrl: String?) {
     val imageLoader = rememberAppImageLoader()
     var isSubscribed by remember { mutableStateOf(false) }
+    val subscriptionVM: SubscriptionViewModel = viewModel()
+
+    val error by subscriptionVM.error.collectAsState()
+    val context = LocalContext.current
+    LaunchedEffect(error) {
+        error?.let {
+            Toast.makeText(context, "Error de suscripción: $it", Toast.LENGTH_SHORT).show()
+            isSubscribed = !isSubscribed // Revertir el estado si la llamada falló
+            subscriptionVM.clearError()
+        }
+    }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -281,7 +299,10 @@ fun MerchantHeaderCard(name: String, logoUrl: String?) {
                 )
                 Switch(
                     checked = isSubscribed,
-                    onCheckedChange = { isSubscribed = it },
+                    onCheckedChange = { newSubscriptionState ->
+                        isSubscribed = newSubscriptionState
+                        subscriptionVM.toggleSubscription(merchantId)
+                    },
                     colors = SwitchDefaults.colors(
                         checkedTrackColor = MaterialTheme.colorScheme.secondary,
                         checkedThumbColor = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.5f)

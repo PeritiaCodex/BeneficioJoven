@@ -23,7 +23,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 
 /**
@@ -85,48 +89,43 @@ fun TermsScreen(
                         .verticalScroll(rememberScrollState())
                 ) {
                     Text(
-                        text = """
-                            Acá estarían los términos y condiciones...
-                            
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-                            Nulla vel odio eu ligula suscipit iaculis. 
-                            Curabitur eu nisl nec lorem facilisis faucibus. 
-                            Maecenas tempus orci ut lacus interdum, vel lacinia leo fermentum. 
-                            Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
-                            
-                            Suspendisse eget turpis et metus volutpat faucibus. 
-                            Morbi ultricies purus non justo fermentum, at blandit ex imperdiet. 
-                            Quisque at lorem ac velit viverra varius non non ligula.
-                            
-                            Donec ut libero in mi cursus pulvinar. 
-                            Cras in sem vel justo ultrices imperdiet. 
-                            Integer luctus nunc vel enim cursus, non vestibulum risus ultricies.
-                            
-                            Nam fermentum bibendum mi sit amet efficitur. 
-                            Aliquam erat volutpat. 
-                            Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae.
-                            
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-                            Nulla vel odio eu ligula suscipit iaculis. 
-                            Curabitur eu nisl nec lorem facilisis faucibus. 
-                            Maecenas tempus orci ut lacus interdum, vel lacinia leo fermentum. 
-                            Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
-                            
-                            Suspendisse eget turpis et metus volutpat faucibus. 
-                            Morbi ultricies purus non justo fermentum, at blandit ex imperdiet. 
-                            Quisque at lorem ac velit viverra varius non non ligula.
-                            
-                            Donec ut libero in mi cursus pulvinar. 
-                            Cras in sem vel justo ultrices imperdiet. 
-                            Integer luctus nunc vel enim cursus, non vestibulum risus ultricies.
-                            
-                            Nam fermentum bibendum mi sit amet efficitur. 
-                            Aliquam erat volutpat. 
-                            Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae.
-                        """.trimIndent(),
+                        // Usamos buildAnnotatedString para formatear el texto.
+                        text = buildAnnotatedString {
+                            append("Bienvenido a Beneficio Joven. Al usar nuestra aplicación, aceptas los siguientes términos:\n\n")
 
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append("1. Aceptación de los términos\n")
+                            }
+                            append("Al registrarte y utilizar la aplicación Beneficio Joven, aceptas cumplir con los presentes Términos y Condiciones de uso. El acceso y uso de esta app está destinado exclusivamente a jóvenes beneficiarios registrados por el municipio de Atizapán.\n\n")
+
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append("2. Uso autorizado\n")
+                            }
+                            append("La app debe utilizarse únicamente para consultar, redimir y administrar cupones dentro del programa Beneficio Joven. Queda estrictamente prohibido manipular la app, compartir accesos personales o realizar usos indebidos del sistema.\n\n")
+
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append("3. Protección de datos personales\n")
+                            }
+                            append("Los datos proporcionados (nombre, CURP, correo electrónico, municipio, etc.) serán tratados conforme a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares. Se utilizarán exclusivamente para fines del programa, y no se compartirán con terceros sin consentimiento.\n\n")
+
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append("4. Responsabilidad del usuario\n")
+                            }
+                            append("Es responsabilidad del usuario mantener su información actualizada y no compartir sus credenciales de acceso. Cualquier uso indebido de su cuenta será responsabilidad del titular registrado.\n\n")
+
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append("5. Modificaciones y suspensión\n")
+                            }
+                            append("El municipio y los administradores del programa se reservan el derecho de modificar, suspender o cancelar el acceso a la app en caso de incumplimiento de estos términos o por mantenimiento del sistema.\n\n")
+
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append("6. Soporte y contacto\n")
+                            }
+                            append("Para dudas, problemas técnicos o reportes de mal funcionamiento, los usuarios pueden contactar a soporte a través del panel de ayuda disponible en la app o acudir directamente a las oficinas de la Dirección de Juventud.")
+                        },
                         color = MaterialTheme.colorScheme.onSurface,
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyLarge, // Un poco más grande para mejorar legibilidad
+                        textAlign = TextAlign.Justify // Justificar el texto se ve más profesional
                     )
                 }
             }
