@@ -1,6 +1,8 @@
 package mx.itesm.beneficiojoven.view.ui.nav
 
+import android.app.Application
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -9,6 +11,7 @@ import mx.itesm.beneficiojoven.model.Role
 import mx.itesm.beneficiojoven.view.ui.screens.*
 import mx.itesm.beneficiojoven.vm.AuthViewModel
 import mx.itesm.beneficiojoven.vm.CouponListVM
+import java.net.URLDecoder
 
 /**
  * Host principal de navegación basado en **Navigation Compose**.
@@ -31,6 +34,7 @@ fun AppNavHost(nav: NavHostController) {
     // ViewModels de alcance del host (alternativamente podrían inyectarse por DI/Hilt)
     val authVM: AuthViewModel = viewModel()
     val listVM: CouponListVM = viewModel()
+
 
     NavHost(navController = nav, startDestination = Screen.Login.route) {
         composable(Screen.Login.route) {
@@ -59,19 +63,7 @@ fun AppNavHost(nav: NavHostController) {
                 onTerms = { nav.navigate(Screen.Terms.route)}
             )
         }
-        composable(Screen.Forgot.route)   {
-            ForgotScreen(
-                authViewModel = authVM,
-                onBack = { nav.popBackStack() },
-                onLoginRedirect = {
-                    nav.navigate(Screen.Login.route) {
-                        popUpTo(Screen.Login.route) {
-                            inclusive = true
-                        }
-                    }
-                }
-            )
-        }
+        composable(Screen.Forgot.route)   { ForgotScreen(onBack = { nav.popBackStack() }) }
         composable(Screen.Terms.route)    { TermsScreen(onBack = { nav.popBackStack() }) }
 
         composable(Screen.Businesses.route) {
@@ -86,14 +78,8 @@ fun AppNavHost(nav: NavHostController) {
         }
 
         composable(Screen.CouponsByMerchant.route) { backStackEntry ->
-            val merchant = backStackEntry.arguments?.getString("merchant")?.let { java.net.URLDecoder.decode(it, "UTF-8") } ?: return@composable
-            CouponScreen(
-                merchantName = merchant,
-                vm = listVM,
-                onBack = { nav.popBackStack() },
-                onOpenFavorites = { nav.navigate(Screen.Favorites.route) }, // <-- He añadido los callbacks que faltaban
-                onOpenProfile = { nav.navigate(Screen.Profile.route) }      // <-- en tu archivo original.
-            )
+            val merchant = backStackEntry.arguments?.getString("merchant")?.let { URLDecoder.decode(it, "UTF-8") } ?: return@composable
+            CouponScreen(merchantName = merchant, vm = listVM, onBack = { nav.popBackStack() })
         }
 
         composable(Screen.Profile.route) {
