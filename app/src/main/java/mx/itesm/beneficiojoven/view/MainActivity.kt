@@ -6,6 +6,7 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -57,8 +58,19 @@ class MainActivity : ComponentActivity() {
      *
      * @param savedInstanceState Estado previamente guardado por el sistema (si existe).
      */
+    private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        requestPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestPermission(),
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+            } else {
+                // Avisar que no habrá notificaciones
+            }
+        }
 
         solicitarPermiso()
         obtenerToken()
@@ -72,26 +84,16 @@ class MainActivity : ComponentActivity() {
     }
 
 
-private fun solicitarPermiso() {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
-            PackageManager.PERMISSION_GRANTED
-        ) {
-        } else {
-            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+    private fun solicitarPermiso() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
+                PackageManager.PERMISSION_GRANTED
+            ) {
+            } else {
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
         }
     }
-}
-
-private val requestPermissionLauncher = registerForActivityResult(
-    ActivityResultContracts.RequestPermission(),
-) { isGranted: Boolean ->
-    if (isGranted) {
-        // Habilitar funciones
-    } else {
-        // Avisar que no habrá notificaciones
-    }
-}
 private fun obtenerToken() {
     FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
         if (!task.isSuccessful) {
@@ -102,13 +104,4 @@ private fun obtenerToken() {
         println("FCM TOKEN: $token")
     })
 }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        fontSize = 26.sp,
-        modifier = modifier
-    )
 }

@@ -67,6 +67,9 @@ dependencies {
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.benchmark.traceprocessor)
     implementation(libs.firebase.messaging)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.play.services.location)
+    implementation(libs.play.services.maps)
 
     // --- Test espresso
     androidTestImplementation("androidx.test.espresso:espresso-intents:3.7.0")

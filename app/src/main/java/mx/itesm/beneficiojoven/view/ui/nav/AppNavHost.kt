@@ -1,7 +1,6 @@
 package mx.itesm.beneficiojoven.view.ui.nav
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -88,7 +87,13 @@ fun AppNavHost(nav: NavHostController) {
 
         composable(Screen.CouponsByMerchant.route) { backStackEntry ->
             val merchant = backStackEntry.arguments?.getString("merchant")?.let { java.net.URLDecoder.decode(it, "UTF-8") } ?: return@composable
-            CouponScreen(merchantName = merchant, vm = listVM, onBack = { nav.popBackStack() })
+            CouponScreen(
+                merchantName = merchant,
+                vm = listVM,
+                onBack = { nav.popBackStack() },
+                onOpenFavorites = { nav.navigate(Screen.Favorites.route) }, // <-- He añadido los callbacks que faltaban
+                onOpenProfile = { nav.navigate(Screen.Profile.route) }      // <-- en tu archivo original.
+            )
         }
 
         composable(Screen.Profile.route) {
