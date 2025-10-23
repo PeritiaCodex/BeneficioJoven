@@ -2,6 +2,7 @@ package mx.itesm.beneficiojoven.view.ui.nav
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -29,8 +30,8 @@ import mx.itesm.beneficiojoven.vm.CouponListVM
 @Composable
 fun AppNavHost(nav: NavHostController) {
     // ViewModels de alcance del host (alternativamente podrían inyectarse por DI/Hilt)
-    val authVM = remember { AuthViewModel() }
-    val listVM = remember { CouponListVM() }
+    val authVM: AuthViewModel = viewModel()
+    val listVM: CouponListVM = viewModel()
 
     NavHost(navController = nav, startDestination = Screen.Login.route) {
         composable(Screen.Login.route) {

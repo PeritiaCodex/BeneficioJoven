@@ -2,6 +2,7 @@ package mx.itesm.beneficiojoven.view.ui.screens
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
@@ -9,6 +10,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -21,12 +23,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import coil.compose.AsyncImage
+import mx.itesm.beneficiojoven.view.ui.components.AutoResizeText
 import mx.itesm.beneficiojoven.view.ui.components.LiquidGlassCard
 import mx.itesm.beneficiojoven.view.ui.rememberAppImageLoader
 import mx.itesm.beneficiojoven.vm.CouponListVM
@@ -63,12 +68,14 @@ fun BusinessesScreen(
     val loading by vm.loading.collectAsState()
     val error by vm.error.collectAsState()
     val allCoupons by vm.coupons.collectAsState()
+    val activeFilters by vm.activeFilters.collectAsState() // <- Obtener filtros activos
+    val topFilters by vm.topFilters.collectAsState() // <- Obtener top 3
 
     // Carga inicial si no hay datos y no se está cargando.
     LaunchedEffect(Unit) { if (allCoupons.isEmpty() && !loading) vm.refresh() }
 
     // Agregación: cupones → negocios (primer cupón aporta logo/desc)
-    val businesses: List<Business> = remember(allCoupons) {
+    val businesses: List<Business> = remember(allCoupons, activeFilters) {
         allCoupons
             .groupBy { it.merchant.name }
             .map { (name, list) ->
@@ -79,6 +86,9 @@ fun BusinessesScreen(
                     description = first.description.ifBlank { "Explora ${list.size} cupón(es) disponibles." },
                     type = first.merchant.type
                 )
+            }
+            .filter { business ->
+                activeFilters.isEmpty() || activeFilters.contains(business.type)
             }
             .sortedBy { it.title.lowercase() }
     }
@@ -126,9 +136,17 @@ fun BusinessesScreen(
                 Column(modifier = Modifier.zIndex(1f)) {
                     FilterBar(
                         isExpanded = isFilterExpanded,
-                        onToggle = { isFilterExpanded = !isFilterExpanded }
+                        onToggle = { isFilterExpanded = !isFilterExpanded },
+                        topFilters = topFilters, // <- Pasar top 3
+                        activeFilters = activeFilters, // <- Pasar filtros activos
+                        onFilterClick = vm::toggleFilter // <- Pasar acción
                     )
-                    ExpandedFiltersPanel(visible = isFilterExpanded)
+                    ExpandedFiltersPanel(
+                        visible = isFilterExpanded,
+                        activeFilters = activeFilters,
+                        onFilterClick = vm::toggleFilter,
+                        onClearFilters = vm::clearFilters
+                    )
                 }
             }
 
@@ -165,7 +183,13 @@ fun Header() {
  * @param onToggle Acción para alternar el estado de expansión.
  */
 @Composable
-fun FilterBar(isExpanded: Boolean, onToggle: () -> Unit) {
+fun FilterBar(
+    isExpanded: Boolean,
+    onToggle: () -> Unit,
+    topFilters: List<String>,
+    activeFilters: Set<String>,
+    onFilterClick: (String) -> Unit
+) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.65f)),
         modifier = Modifier.fillMaxWidth()
@@ -177,10 +201,19 @@ fun FilterBar(isExpanded: Boolean, onToggle: () -> Unit) {
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            FilterChip(label = "Comida", onClick = { /* TODO */ }, modifier = Modifier.weight(1f))
-            FilterChip(label = "Salud", onClick = { /* TODO */ }, modifier = Modifier.weight(1f))
-            FilterChip(label = "Belleza", onClick = { /* TODO */ }, modifier = Modifier.weight(1f))
-
+            // Muestra el top 3 de filtros
+            topFilters.take(3).forEach { filter ->
+                FilterChip(
+                    label = filter,
+                    onClick = { onFilterClick(filter) },
+                    isSelected = activeFilters.contains(filter),
+                    modifier = Modifier.weight(1f)
+                )
+            }
+            // Rellena con chips vacíos si el top 3 no está completo
+            repeat(3 - topFilters.size) {
+                Spacer(modifier = Modifier.weight(1f))
+            }
             IconToggleButton(checked = isExpanded, onCheckedChange = { onToggle() }) {
                 Icon(
                     imageVector = if (isExpanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
@@ -198,11 +231,29 @@ fun FilterBar(isExpanded: Boolean, onToggle: () -> Unit) {
  * @param visible Controla la visibilidad del panel.
  */
 @Composable
-fun ExpandedFiltersPanel(visible: Boolean) {
+fun ExpandedFiltersPanel(
+    visible: Boolean,
+    activeFilters: Set<String>,
+    onFilterClick: (String) -> Unit,
+    onClearFilters: () -> Unit
+) {
     val allFilters = listOf(
-        "Entretenimiento", "Comida", "Salud", "Belleza",
-        "Educación", "Moda", "Servicios", "Hogar", "Viajes"
-    )
+        "Conveniencia", "Entretenimiento", "Supermercado", "Departamental",
+        "Librería", "Restaurante", "Telecomunicaciones", "Deportes"
+    ).sorted() // Ordenados alfabéticamente
+    // 1. Define la altura de cada fila y el espaciado vertical
+    val rowHeight = 40.dp // Altura de un chip + padding
+    val verticalSpacing = 8.dp
+    val numberOfColumns = 3 // <-- Fija el número de columnas a 3.
+
+    // 2. Calcular el número de filas necesarias.
+    val rowCount = ((allFilters.size - 1) / numberOfColumns) + 1
+
+    // 3. Calcular la altura total de la grilla.
+    // Altura de todas las filas + altura de todos los espaciados entre ellas.
+    val gridHeight = (rowHeight * rowCount) + (verticalSpacing * (rowCount - 1))
+
+    // --- FIN DE LA MODIFICACIÓN ---
 
     AnimatedVisibility(visible = visible) {
         Card(
@@ -210,15 +261,31 @@ fun ExpandedFiltersPanel(visible: Boolean) {
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.medium.copy(topStart = CornerSize(0), topEnd = CornerSize(0))
         ) {
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(minSize = 120.dp),
-                contentPadding = PaddingValues(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(allFilters.size) { index ->
-                    FilterChip(label = allFilters[index], onClick = { /* TODO */ })
+            Column {
+                LazyVerticalGrid(
+                    // 4. Usa GridCells.Fixed con el número de columnas que definimos.
+                    columns = GridCells.Fixed(numberOfColumns),
+                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(verticalSpacing),
+                    // 5. Aplica la altura calculada, que ahora es correcta.
+                    modifier = Modifier.height(gridHeight)
+                ) {
+                    items(allFilters) { filter ->
+                        FilterChip(
+                            label = filter,
+                            onClick = { onFilterClick(filter) },
+                            isSelected = activeFilters.contains(filter)
+                        )
+                    }
                 }
+                TextButton(
+                    onClick = onClearFilters,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                ) {
+                    Text("Limpiar filtros", color = MaterialTheme.colorScheme.onPrimary)
+                }
+                Spacer(Modifier.height(8.dp))
             }
         }
     }
@@ -232,19 +299,34 @@ fun ExpandedFiltersPanel(visible: Boolean) {
  * @param modifier Modificador de composición opcional.
  */
 @Composable
-fun FilterChip(label: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun FilterChip(
+    label: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    isSelected: Boolean = false
+) {
+    val borderColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
+    val backgroundColor = if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.3f) else MaterialTheme.colorScheme.surfaceTint
+
     Surface(
-        color = MaterialTheme.colorScheme.surfaceTint,
+        color = backgroundColor,
         shape = MaterialTheme.shapes.small,
-        modifier = modifier.clickable { onClick() }
+        modifier = modifier
+            .clickable { onClick() }
+            .border(width = 1.5.dp, color = borderColor, shape = MaterialTheme.shapes.small)
     ) {
-        Text(
-            text = label,
-            color = MaterialTheme.colorScheme.outlineVariant,
-            style = MaterialTheme.typography.labelMedium,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)
-        )
+        Box(
+            modifier = Modifier
+                .padding(horizontal = 8.dp, vertical = 8.dp), // El padding define el tamaño mínimo
+            contentAlignment = Alignment.Center // Esto centra su contenido (el texto)
+        ) {
+            AutoResizeText(
+                text = label,
+                style = MaterialTheme.typography.labelMedium.copy(textAlign = TextAlign.Center),
+                color = MaterialTheme.colorScheme.outlineVariant,
+                modifier = Modifier
+            )
+        }
     }
 }
 

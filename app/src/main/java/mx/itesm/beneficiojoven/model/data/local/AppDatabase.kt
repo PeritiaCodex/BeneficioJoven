@@ -12,11 +12,16 @@ import androidx.room.RoomDatabase
  * @see CouponDao
  */
 @Database(
-    entities = [FavCouponEntity::class],
-    version = 1,
+    entities = [
+        FavCouponEntity::class,
+               FilterClickEntity::class
+    ],
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
     /** Provee el DAO para operar sobre la tabla de favoritos. */
     abstract fun couponDao(): CouponDao
+    /** Provee el DAO para operar sobre la tabla de filtros. */
+    abstract fun filterClickDao(): FilterClickDao
 }
