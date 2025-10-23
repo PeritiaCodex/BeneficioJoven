@@ -20,15 +20,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.error
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import mx.itesm.beneficiojoven.R
-import mx.itesm.beneficiojoven.vm.AuthViewModel
+import mx.itesm.beneficiojoven.view.ui.components.GradientButton // Importa el GradientButton
 
 // Define los pasos del flujo de recuperación
 private enum class ForgotStep {
@@ -50,8 +52,6 @@ private enum class ForgotStep {
 @Composable
 fun ForgotScreen(
     onBack: () -> Unit,
-    onLoginRedirect: () -> Unit, // Añadido para navegar al login
-    authViewModel: AuthViewModel = viewModel()
 ) {
     // Estado para controlar el paso actual del flujo
     var currentStep by remember { mutableStateOf(ForgotStep.EMAIL) }
@@ -62,21 +62,23 @@ fun ForgotScreen(
     var newPassword by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
 
-    // Estados del ViewModel
-    val loading by authViewModel.loading.collectAsState()
-    val error by authViewModel.error.collectAsState()
-    val resetSuccess by authViewModel.resetSuccess.collectAsState()
-
     // Validaciones
     val passwordsMatch = newPassword.isNotEmpty() && newPassword == confirmPassword
     val isPasswordValid = newPassword.length >= 6
 
-    LaunchedEffect(resetSuccess) {
-        if (resetSuccess) {
-            onLoginRedirect()
-            authViewModel.consumeResetSuccess() // Limpia la señal
-        }
-    }
+    // --- Definición de colores para consistencia ---
+    val textFieldColors = TextFieldDefaults.colors(
+        focusedContainerColor = Color.Transparent,
+        unfocusedContainerColor = Color.Transparent,
+        focusedTextColor = MaterialTheme.colorScheme.secondary,
+        unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        cursorColor = MaterialTheme.colorScheme.secondary,
+        focusedLabelColor = MaterialTheme.colorScheme.secondary,
+        unfocusedLabelColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
+        focusedIndicatorColor = MaterialTheme.colorScheme.secondary,
+        unfocusedIndicatorColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f),
+        errorIndicatorColor = MaterialTheme.colorScheme.error
+    )
 
     GradientScreenLayout(contentPadding = PaddingValues(0.dp)) {
         Column(
@@ -95,7 +97,7 @@ fun ForgotScreen(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Regresar",
-                        tint = MaterialTheme.colorScheme.onPrimary,
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(32.dp)
                     )
                 }
@@ -111,10 +113,16 @@ fun ForgotScreen(
                 modifier = Modifier.size(90.dp)
             )
             Spacer(modifier = Modifier.height(12.dp))
+            // Texto con estilo parcial en negritas
             Text(
-                text = "BENEFICIO JOVEN",
+                text = buildAnnotatedString {
+                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                        append("BENEFICIO")
+                    }
+                    append(" JOVEN")
+                },
+                color = MaterialTheme.colorScheme.onPrimary,
                 style = MaterialTheme.typography.titleLarge,
-                color = Color.White,
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(12.dp))
@@ -123,21 +131,21 @@ fun ForgotScreen(
             Surface(
                 shape = CardDefaults.shape,
                 shadowElevation = 8.dp,
-                color = MaterialTheme.colorScheme.scrim.copy(alpha = 0.2f),
+                color = MaterialTheme.colorScheme.surface,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp) // Padding exterior para separar el contenedor de los bordes
+                    .padding(16.dp)
             ) {
                 Column(
                     modifier = Modifier
-                        .padding(16.dp) // Padding interior para el contenido
+                        .padding(16.dp)
                         .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
                         text = "Recuperar contraseña",
                         style = MaterialTheme.typography.headlineSmall,
-                        color = Color.White
+                        color = MaterialTheme.colorScheme.primary
                     )
                     Spacer(modifier = Modifier.height(24.dp))
 
@@ -158,15 +166,7 @@ fun ForgotScreen(
                                         onValueChange = { email = it },
                                         label = { Text("Ingresa tu correo:") },
                                         modifier = Modifier.fillMaxWidth(),
-                                        colors = OutlinedTextFieldDefaults.colors(
-                                            focusedBorderColor = MaterialTheme.colorScheme.tertiary,
-                                            unfocusedBorderColor = Color.Gray,
-                                            focusedTextColor = Color.White,
-                                            unfocusedTextColor = Color.White,
-                                            focusedLabelColor = MaterialTheme.colorScheme.onTertiary,
-                                            unfocusedLabelColor = Color.LightGray,
-                                            cursorColor = MaterialTheme.colorScheme.tertiary
-                                        ),
+                                        colors = textFieldColors,
                                         singleLine = true,
                                         keyboardOptions = KeyboardOptions(
                                             keyboardType = KeyboardType.Email,
@@ -174,23 +174,10 @@ fun ForgotScreen(
                                         )
                                     )
                                     Spacer(modifier = Modifier.height(24.dp))
-                                    Button(
-                                        onClick = {
-                                            authViewModel.requestPasswordReset(email)
-                                            currentStep = ForgotStep.CODE
-                                        },
+                                    GradientButton(
+                                        onClick = { currentStep = ForgotStep.CODE },
                                         modifier = Modifier.fillMaxWidth(),
-                                        enabled = email.contains("@") && email.contains("."),
-                                        colors = ButtonDefaults.buttonColors(
-                                            containerColor = MaterialTheme.colorScheme.onPrimary,
-                                            contentColor = Color.White,
-                                            disabledContainerColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(
-                                                alpha = 0.12f
-                                            ),
-                                            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(
-                                                alpha = 0.38f
-                                            )
-                                        )
+                                        enabled = email.contains("@") && email.contains(".")
                                     ) {
                                         Text("Enviar")
                                     }
@@ -202,15 +189,7 @@ fun ForgotScreen(
                                         onValueChange = { code = it },
                                         label = { Text("Ingresa el código de verificación:") },
                                         modifier = Modifier.fillMaxWidth(),
-                                        colors = OutlinedTextFieldDefaults.colors(
-                                            focusedBorderColor = MaterialTheme.colorScheme.tertiary,
-                                            unfocusedBorderColor = Color.Gray,
-                                            focusedTextColor = Color.White,
-                                            unfocusedTextColor = Color.White,
-                                            focusedLabelColor = MaterialTheme.colorScheme.onTertiary,
-                                            unfocusedLabelColor = Color.LightGray,
-                                            cursorColor = MaterialTheme.colorScheme.tertiary
-                                        ),
+                                        colors = textFieldColors,
                                         singleLine = true,
                                         keyboardOptions = KeyboardOptions(
                                             keyboardType = KeyboardType.Number,
@@ -218,22 +197,10 @@ fun ForgotScreen(
                                         )
                                     )
                                     Spacer(modifier = Modifier.height(24.dp))
-                                    Button(
-                                        onClick = {
-                                            currentStep = ForgotStep.PASSWORD
-                                        },
+                                    GradientButton(
+                                        onClick = { currentStep = ForgotStep.PASSWORD },
                                         modifier = Modifier.fillMaxWidth(),
-                                        enabled = code.length >= 4,
-                                        colors = ButtonDefaults.buttonColors(
-                                            containerColor = MaterialTheme.colorScheme.onPrimary,
-                                            contentColor = Color.White,
-                                            disabledContainerColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(
-                                                alpha = 0.12f
-                                            ),
-                                            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(
-                                                alpha = 0.38f
-                                            )
-                                        )
+                                        enabled = code.length >= 4
                                     ) {
                                         Text("Siguiente")
                                     }
@@ -245,15 +212,7 @@ fun ForgotScreen(
                                         onValueChange = { newPassword = it },
                                         label = { Text("Contraseña nueva (mín. 6 caracteres):") },
                                         modifier = Modifier.fillMaxWidth(),
-                                        colors = OutlinedTextFieldDefaults.colors(
-                                            focusedBorderColor = MaterialTheme.colorScheme.tertiary,
-                                            unfocusedBorderColor = Color.Gray,
-                                            focusedTextColor = Color.White,
-                                            unfocusedTextColor = Color.White,
-                                            focusedLabelColor = MaterialTheme.colorScheme.onTertiary,
-                                            unfocusedLabelColor = Color.LightGray,
-                                            cursorColor = MaterialTheme.colorScheme.tertiary
-                                        ),
+                                        colors = textFieldColors,
                                         visualTransformation = PasswordVisualTransformation(),
                                         singleLine = true,
                                         isError = newPassword.isNotEmpty() && !isPasswordValid
@@ -264,54 +223,22 @@ fun ForgotScreen(
                                         onValueChange = { confirmPassword = it },
                                         label = { Text("Confirmar contraseña:") },
                                         modifier = Modifier.fillMaxWidth(),
-                                        colors = OutlinedTextFieldDefaults.colors(
-                                            focusedBorderColor = MaterialTheme.colorScheme.tertiary,
-                                            unfocusedBorderColor = Color.Gray,
-                                            focusedTextColor = Color.White,
-                                            unfocusedTextColor = Color.White,
-                                            focusedLabelColor = MaterialTheme.colorScheme.onTertiary,
-                                            unfocusedLabelColor = Color.LightGray,
-                                            cursorColor = MaterialTheme.colorScheme.tertiary
-                                        ),
+                                        colors = textFieldColors,
                                         visualTransformation = PasswordVisualTransformation(),
                                         singleLine = true,
                                         isError = confirmPassword.isNotEmpty() && !passwordsMatch
                                     )
                                     Spacer(modifier = Modifier.height(24.dp))
-                                    Button(
+                                    GradientButton(
                                         onClick = {
-                                            authViewModel.resetPassword(code, newPassword)
+                                            onBack()
                                         },
                                         modifier = Modifier.fillMaxWidth(),
-                                        enabled = isPasswordValid && passwordsMatch,
-                                        colors = ButtonDefaults.buttonColors(
-                                            containerColor = MaterialTheme.colorScheme.onPrimary,
-                                            contentColor = Color.White,
-                                            disabledContainerColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(
-                                                alpha = 0.12f
-                                            ),
-                                            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(
-                                                alpha = 0.38f
-                                            )
-                                        )
+                                        enabled = isPasswordValid && passwordsMatch
                                     ) {
-                                        if (loading) {
-                                            CircularProgressIndicator(modifier = Modifier.size(24.dp))
-                                        } else {
-                                            Text("Confirmar contraseña")
-                                        }
+                                        Text("Confirmar")
                                     }
                                 }
-                            }
-                            // Muestra el mensaje de error si existe
-                            error?.let {
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    text = it,
-                                    color = MaterialTheme.colorScheme.error,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    textAlign = TextAlign.Center
-                                )
                             }
                         }
                     }
