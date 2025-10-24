@@ -47,7 +47,7 @@ interface AppRepository {
      *
      * @return [Result] con la colección de cupones o un error.
      */
-    suspend fun coupons(): Result<List<mx.itesm.beneficiojoven.model.Coupon>>
+    suspend fun coupons(): Result<List<Coupon>>
 
     /**
      * Recupera un cupón por su identificador.
@@ -55,7 +55,7 @@ interface AppRepository {
      * @param id Identificador del cupón.
      * @return [Result] con el cupón o un error si no se encontró.
      */
-    suspend fun couponById(id: String): Result<mx.itesm.beneficiojoven.model.Coupon>
+    suspend fun couponById(id: String): Result<Coupon>
 
     /** Obtiene los datos del perfil de un usuario.
      * @param userId ID del usuario.
@@ -91,4 +91,6 @@ interface AppRepository {
     suspend fun updateFcmToken(fcmToken: String): Result<Unit>
 
     suspend fun toggleSubscription(merchantId: String): Result<Any>
+
+    suspend fun logout()
 }

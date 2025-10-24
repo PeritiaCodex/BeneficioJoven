@@ -110,6 +110,7 @@ fun AppNavHost(nav: NavHostController) {
             ProfileScreen(
                 onBack = { nav.popBackStack() },
                 onLogout = {
+                    authVM.logout()
                     nav.navigate(Screen.Login.route) {
                         popUpTo(0) // Limpia toda la pila de navegación
                     }

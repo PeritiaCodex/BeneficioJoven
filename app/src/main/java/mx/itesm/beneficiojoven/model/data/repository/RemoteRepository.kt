@@ -106,6 +106,11 @@ class RemoteRepository : AppRepository {
         User(id = body.id.toString(), email = email, fullName = name, role = role) // Usamos el ID real
     }
 
+    override suspend fun logout() {
+        Session.token = null
+        Session.userId = null
+    }
+
     /**
      * Recupera la lista de cupones desde el backend y los mapea a dominio.
      *

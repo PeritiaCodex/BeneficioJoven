@@ -87,6 +87,11 @@ class AuthViewModel(
         _loading.value = false
     }
 
+    fun logout() = viewModelScope.launch {
+        repo.logout()
+        _user.value = null
+    }
+
     /**
      * Solicita el envío de un token de restablecimiento de contraseña al correo del usuario.
      *
