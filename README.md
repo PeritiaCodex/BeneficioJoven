@@ -27,6 +27,8 @@ El proyecto busca impulsar la participación juvenil y facilitar el acceso a ben
     -   Código: [https://github.com/A01801461/beneficio_joven_paneles](https://github.com/A01801461/beneficio_joven_paneles)
         
     -   Gestión de usuarios (jóvenes registrados).
+      
+    -   Alojado en: [https://beneficiojoven.site](https://beneficiojoven.site)
         
     -   Alta/edición de comercios.
         
