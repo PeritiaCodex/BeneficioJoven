@@ -30,10 +30,20 @@ import mx.itesm.beneficiojoven.vm.CouponListVM
 @Composable
 fun AppNavHost(nav: NavHostController) {
     // ViewModels de alcance del host (alternativamente podrían inyectarse por DI/Hilt)
+
+    /** ViewModel para gestionar la autenticación y estado del usuario. */
     val authVM: AuthViewModel = viewModel()
+    /** ViewModel para gestionar la carga y estado de las listas (cupones, negocios). */
     val listVM: CouponListVM = viewModel()
 
     NavHost(navController = nav, startDestination = Screen.Login.route) {
+
+        /**
+         * Pantalla de **Login**.
+         * Punto de entrada de la app. Al loguearse, obtiene el token FCM
+         * y redirige según el rol del usuario ([Role.ADMIN] o [Role.MERCHANT]
+         * van a [Screen.Validation], el resto a [Screen.Businesses]).
+         */
         composable(Screen.Login.route) {
             LoginScreen(
                 vm = authVM,
@@ -58,6 +68,12 @@ fun AppNavHost(nav: NavHostController) {
                 onTerms = { nav.navigate(Screen.Terms.route) }
             )
         }
+
+        /**
+         * Pantalla de **Registro**.
+         * Permite crear una nueva cuenta. Al registrarse exitosamente, navega
+         * a la pantalla principal de negocios [Screen.Businesses].
+         */
         composable(Screen.Register.route) {
             RegisterScreen(
                 vm = authVM,
@@ -69,6 +85,12 @@ fun AppNavHost(nav: NavHostController) {
                 onTerms = { nav.navigate(Screen.Terms.route)}
             )
         }
+
+        /**
+         * Pantalla de **Olvido de Contraseña**.
+         * Permite al usuario solicitar un reseteo de contraseña.
+         * Si el reseteo es exitoso, redirige de vuelta al [Screen.Login].
+         */
         composable(Screen.Forgot.route)   {
             ForgotScreen(
                 authViewModel = authVM,
@@ -82,8 +104,20 @@ fun AppNavHost(nav: NavHostController) {
                 }
             )
         }
+
+        /**
+         * Pantalla de **Términos y Condiciones**.
+         * Pantalla informativa estática con botón de regreso.
+         */
         composable(Screen.Terms.route)    { TermsScreen(onBack = { nav.popBackStack() }) }
 
+        /**
+         * Pantalla principal para usuarios: **Lista de Negocios**.
+         * Muestra los comercios disponibles. Permite navegar a:
+         * - [Screen.CouponsByMerchant]: Cupones de un comercio específico.
+         * - [Screen.Favorites]: Cupones favoritos del usuario.
+         * - [Screen.Profile]: Perfil del usuario.
+         */
         composable(Screen.Businesses.route) {
             BusinessesScreen(
                 vm = listVM,
@@ -95,6 +129,11 @@ fun AppNavHost(nav: NavHostController) {
             )
         }
 
+        /**
+         * Pantalla de **Cupones por Comercio**.
+         * Muestra la lista de cupones para un `merchant` específico,
+         * obtenido de los argumentos de la ruta.
+         */
         composable(Screen.CouponsByMerchant.route) { backStackEntry ->
             val merchant = backStackEntry.arguments?.getString("merchant")?.let { java.net.URLDecoder.decode(it, "UTF-8") } ?: return@composable
             CouponScreen(
@@ -106,6 +145,11 @@ fun AppNavHost(nav: NavHostController) {
             )
         }
 
+        /**
+         * Pantalla de **Perfil de Usuario**.
+         * Muestra información del usuario y permite cerrar sesión (`onLogout`).
+         * Al cerrar sesión, limpia toda la pila de navegación y vuelve al [Screen.Login].
+         */
         composable(Screen.Profile.route) {
             ProfileScreen(
                 onBack = { nav.popBackStack() },
@@ -118,6 +162,11 @@ fun AppNavHost(nav: NavHostController) {
             )
         }
 
+        /**
+         * Pantalla de **Favoritos**.
+         * Muestra los cupones guardados (favoritos) por el usuario.
+         * Permite navegar al detalle de un cupón específico [Screen.CouponDetail].
+         */
         composable(Screen.Favorites.route) {
             FavoritesScreen(
                 onBack = { nav.popBackStack() },
@@ -127,6 +176,10 @@ fun AppNavHost(nav: NavHostController) {
             )
         }
 
+        /**
+         * Pantalla de **Validación** (para roles [Role.ADMIN] y [Role.MERCHANT]).
+         * Contiene la lógica para escanear y validar cupones.
+         */
         composable(Screen.Validation.route) {
             ValidationScreen() // Llama a la pantalla que ya contiene su propia lógica.
         }

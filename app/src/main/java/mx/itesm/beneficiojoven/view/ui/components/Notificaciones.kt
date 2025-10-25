@@ -14,13 +14,41 @@ import mx.itesm.beneficiojoven.R
 import mx.itesm.beneficiojoven.view.MainActivity
 import kotlin.random.Random
 
+/**
+ * Servicio para gestionar la recepción de Firebase Cloud Messaging (FCM).
+ *
+ * Esta clase es responsable de dos tareas principales:
+ * 1. Recibir nuevos tokens de registro de dispositivo a través de [onNewToken].
+ * 2. Recibir mensajes de datos o notificaciones cuando la app está en primer plano
+ * a través de [onMessageReceived].
+ *
+ * @see FirebaseMessagingService
+ */
 class ServicioMensajesFB: FirebaseMessagingService() {
+
+    /**
+     * Callback invocado cuando se genera un nuevo token de FCM para el dispositivo.
+     *
+     * Es crucial registrar este token en el backend del servidor para poder
+     * enviar notificaciones push a este dispositivo específico.
+     *
+     * @param token El nuevo token de registro del dispositivo.
+     */
     override fun onNewToken(token: String) {
         super.onNewToken(token)
 // Registrar el Token en el servidor (o un tema)
         println("Token de este dispositivo: $token")
     }
 
+    /**
+     * Callback invocado cuando se recibe un mensaje de FCM.
+     *
+     * Este método se activa principalmente cuando la aplicación está en primer plano.
+     * Si el mensaje contiene un payload de `notification`, se extrae y se pasa
+     * a [enviarNotificacion] para mostrarla localmente.
+     *
+     * @param message El mensaje remoto recibido de FCM.
+     */
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
         println("Llegó la notificación REMOTA $message")
@@ -29,6 +57,14 @@ class ServicioMensajesFB: FirebaseMessagingService() {
         }
     }
 
+    /**
+     * Construye y muestra una notificación local en la barra de estado del dispositivo.
+     *
+     * Crea un [Intent] para abrir [MainActivity] al pulsar la notificación.
+     * Configura el canal de notificación (requerido para Android 8.0 Oreo y superior).
+     *
+     * @param message El objeto de notificación extraído del [RemoteMessage].
+     */
     private fun enviarNotificacion(message: RemoteMessage.Notification) {
         val intent = Intent(this, MainActivity::class.java).apply {
             addFlags(FLAG_ACTIVITY_CLEAR_TOP)
@@ -53,7 +89,11 @@ class ServicioMensajesFB: FirebaseMessagingService() {
         manager.notify(Random.nextInt(), notificationBuilder.build())
     }
 
+    /**
+     * Constantes utilizadas por [ServicioMensajesFB].
+     */
     companion object {
+        /** Nombre legible para el canal de notificaciones de FCM. */
         const val CHANNEL_NAME = "FCM notification channel"
     }
 }
