@@ -9,6 +9,8 @@ import mx.itesm.beneficiojoven.model.data.remote.dto.toDomain
 import android.util.Log
 import mx.itesm.beneficiojoven.model.Coupon
 import mx.itesm.beneficiojoven.model.ResetPassword
+import mx.itesm.beneficiojoven.model.data.remote.dto.MerchantProfileDto
+import mx.itesm.beneficiojoven.model.data.remote.dto.SubscriptionToggleResponse
 
 /**
  * Implementación remota de [AppRepository] que consume el backend vía Retrofit.
@@ -145,8 +147,8 @@ class RemoteRepository : AppRepository {
         )
     }
 
-    override suspend fun validateCoupon(code: String): Result<Coupon> {
-        TODO("Not yet implemented")
+    override suspend fun validateCoupon(code: String) = runCatching {
+        api.validate(code).toDomain()
     }
 
     override suspend fun requestPasswordReset(email: String) = runCatching {
@@ -181,22 +183,30 @@ class RemoteRepository : AppRepository {
         }
     }
 
-    override suspend fun toggleSubscription(merchantId: String) = runCatching {
-        // --- INICIO DE LA MODIFICACIÓN PARA LA DEMO ---
-
-        // Este bloque try-catch simulará un éxito perpetuo para la demo.
-        // Ignorará cualquier error de red (como el 500) y permitirá que la UI
-        // mantenga su estado optimista sin revertirse.
-        try {
-            val body = mapOf("merchantId" to "1") // Mantenemos el cuerpo de relleno
-            api.toggleSubscription(merchantId, body)
-        } catch (e: Exception) {
-            // Para la demo, atrapamos el error y no hacemos nada.
-            // Esto evita que el `runCatching` se entere del fallo.
-            println("MODO DEMO: Se ignoró el error en toggleSubscription: ${e.message}")
+    override suspend fun listMerchants(): Result<List<MerchantProfileDto>> = runCatching {
+        val response = api.listMerchants()
+        if (!response.isSuccessful) {
+            throw Exception("Error al obtener la lista de comercios: ${response.code()}")
         }
+        response.body() ?: emptyList()
+    }
 
-        // Al no lanzar una excepción, runCatching siempre devolverá un Result.success(Unit)
-        // --- FIN DE LA MODIFICACIÓN ---
+    // --- Implementaciones de Suscripción ---
+
+    override suspend fun getSubscribedMerchants(): Result<List<Int>> = runCatching {
+        val response = api.getSubscribedMerchants()
+        if (!response.isSuccessful) {
+            throw Exception("Error al obtener suscripciones: ${response.code()}")
+        }
+        response.body() ?: emptyList()
+    }
+
+    override suspend fun toggleSubscription(merchantId: String): Result<SubscriptionToggleResponse> = runCatching {
+        // La llamada a la API ya no necesita un body, solo el ID en la URL.
+        val response = api.toggleSubscription(merchantId)
+        if (!response.isSuccessful) {
+            throw Exception("Error al cambiar la suscripción: ${response.code()}")
+        }
+        response.body() ?: throw IllegalStateException("La respuesta del servidor fue vacía")
     }
 }

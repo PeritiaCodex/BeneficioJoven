@@ -18,10 +18,9 @@ import mx.itesm.beneficiojoven.model.di.ServiceLocator
  * ViewModel para la **lista de cupones**.
  *
  * Orquesta la carga inicial, recargas y la **lógica de filtrado** de cupones.
- * - Carga cupones desde [ServiceLocator].
+ * - Carga cupones y la lista de comercios desde [ServiceLocator].
  * - Gestiona estados de carga, error y la lista de cupones.
- * - Maneja un estado de filtros activos.
- * - Interactúa con [FilterRepository] para guardar y obtener las categorías más usadas.
+ * - Mantiene un mapa para resolver los IDs de los comercios.
  *
  * @param application Requerido por AndroidViewModel para obtener el contexto.
  */
@@ -43,35 +42,27 @@ class CouponListVM(application: Application) : AndroidViewModel(application) {
     private val _coupons = MutableStateFlow<List<Coupon>>(emptyList())
     val coupons: StateFlow<List<Coupon>> = _coupons
 
+    /** Mapa para buscar IDs numéricos de comercios a partir de su nombre. */
+    private val _merchantIdMap = MutableStateFlow<Map<String, Int>>(emptyMap())
+    val merchantIdMap: StateFlow<Map<String, Int>> = _merchantIdMap
+
     // --- INICIO: Lógica de Filtros ---
 
-    // Estado que mantiene el conjunto de filtros de categoría activos (ej: {"Restaurante", "Cine"}).
     private val _activeFilters = MutableStateFlow<Set<String>>(emptySet())
     val activeFilters: StateFlow<Set<String>> = _activeFilters
 
-    // Flujo que observa y expone el Top 3 de filtros más usados desde la base de datos.
     val topFilters: StateFlow<List<String>>
 
     init {
-        // Inicializamos el repositorio de filtros con el DAO de nuestra DB persistente.
         val db = DatabaseProvider.get(application.applicationContext)
         filterRepo = FilterRepository(db.filterClickDao())
 
-        // El Top 3 se obtiene de la base de datos y se convierte en un StateFlow.
         topFilters = filterRepo.observeTopThree()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-        // Carga inicial de datos.
         refresh()
     }
 
-    /**
-     * Alterna la selección de un filtro de categoría.
-     * Si el filtro no estaba activo, lo activa y registra el clic en la base de datos.
-     * Si ya estaba activo, lo desactiva.
-     *
-     * @param type El nombre de la categoría (ej: "Restaurante").
-     */
     fun toggleFilter(type: String) {
         viewModelScope.launch {
             val current = _activeFilters.value.toMutableSet()
@@ -79,16 +70,12 @@ class CouponListVM(application: Application) : AndroidViewModel(application) {
                 current.remove(type)
             } else {
                 current.add(type)
-                // Incrementamos el contador solo cuando se selecciona un nuevo filtro.
                 filterRepo.incrementFilterClick(type)
             }
             _activeFilters.value = current
         }
     }
 
-    /**
-     * Limpia todos los filtros activos, mostrando nuevamente todos los negocios.
-     */
     fun clearFilters() {
         _activeFilters.value = emptySet()
     }
@@ -96,13 +83,37 @@ class CouponListVM(application: Application) : AndroidViewModel(application) {
     // --- FIN: Lógica de Filtros ---
 
     /**
-     * Vuelve a solicitar la lista de cupones al repositorio.
-     *
-     * En éxito, publica la lista en [coupons]; en error, publica el mensaje en [error].
+     * Vuelve a solicitar la lista de cupones y de comercios al repositorio.
      */
     fun refresh() = viewModelScope.launch {
-        _loading.value = true; _error.value = null
-        repo.coupons().onSuccess { _coupons.value = it }.onFailure { _error.value = it.message }
+        _loading.value = true
+        _error.value = null
+
+        // Lanzamos ambas llamadas de red en paralelo para eficiencia
+        val couponsResult = repo.coupons()
+        val merchantsResult = repo.listMerchants()
+
+        // Procesamos el resultado de los cupones
+        couponsResult.onSuccess {
+            _coupons.value = it
+        }.onFailure {
+            _error.value = it.message
+            _loading.value = false
+            return@launch // Si los cupones fallan, no continuamos
+        }
+
+        // Procesamos el resultado de los comercios
+        merchantsResult.onSuccess { merchantProfiles ->
+            // Creamos un mapa de merchant_name -> user_id
+            _merchantIdMap.value = merchantProfiles.associate {
+                it.merchant_name to it.user_id
+            }
+        }.onFailure {
+            // Un fallo aquí no es crítico, la app funciona pero sin suscripciones.
+            // Podemos registrar el error, pero no lo mostramos al usuario para no ser intrusivos.
+            println("No se pudo cargar el directorio de comercios: ${it.message}")
+        }
+
         _loading.value = false
     }
 }

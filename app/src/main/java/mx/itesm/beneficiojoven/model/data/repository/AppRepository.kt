@@ -3,6 +3,8 @@ package mx.itesm.beneficiojoven.model.data.repository
 
 import mx.itesm.beneficiojoven.model.Coupon
 import mx.itesm.beneficiojoven.model.User
+import mx.itesm.beneficiojoven.model.data.remote.dto.MerchantProfileDto
+import mx.itesm.beneficiojoven.model.data.remote.dto.SubscriptionToggleResponse
 
 /**
  * Contrato de acceso a datos de la app.
@@ -41,6 +43,8 @@ interface AppRepository {
         municipality: String,
         birthDate: String = "2000-01-01"
     ): Result<User>
+
+    suspend fun logout()
 
     /**
      * Obtiene la lista de cupones disponibles.
@@ -90,7 +94,23 @@ interface AppRepository {
 
     suspend fun updateFcmToken(fcmToken: String): Result<Unit>
 
-    suspend fun toggleSubscription(merchantId: String): Result<Any>
+    /**
+     * Obtiene la lista completa de perfiles de comercios desde el backend.
+     */
+    suspend fun listMerchants(): Result<List<MerchantProfileDto>>
 
-    suspend fun logout()
+    // --- Funciones de Suscripción ---
+
+    /**
+     * Obtiene la lista de IDs de los comercios a los que el usuario está suscrito.
+     */
+    suspend fun getSubscribedMerchants(): Result<List<Int>>
+
+    /**
+     * Alterna el estado de suscripción a un comercio.
+     *
+     * @param merchantId El ID del comercio.
+     * @return [Result] con la respuesta del backend que indica el nuevo estado.
+     */
+    suspend fun toggleSubscription(merchantId: String): Result<SubscriptionToggleResponse>
 }

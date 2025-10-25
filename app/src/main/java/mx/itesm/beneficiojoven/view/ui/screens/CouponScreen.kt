@@ -78,13 +78,6 @@ import mx.itesm.beneficiojoven.vm.CouponListVM
 import mx.itesm.beneficiojoven.vm.FavoritesVM
 import mx.itesm.beneficiojoven.vm.SubscriptionViewModel
 
-/**
- * Pantalla que muestra los **cupones disponibles** para un comercio específico.
- *
- * @param merchantName Nombre del comercio por el que se filtrará la lista.
- * @param vm ViewModel que provee la colección completa de cupones y estados de carga/error.
- * @param onBack Acción a ejecutar cuando el usuario decide volver.
- */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CouponScreen(
@@ -95,10 +88,11 @@ fun CouponScreen(
     onOpenFavorites: () -> Unit = {},
     onOpenProfile: () -> Unit = {},
     subscriptionVM: SubscriptionViewModel = viewModel()
-    ) {
+) {
     val loading by vm.loading.collectAsState()
     val error by vm.error.collectAsState()
     val all by vm.coupons.collectAsState()
+    val merchantIdMap by vm.merchantIdMap.collectAsState() // Directorio de IDs
 
     val coupons = remember(all, merchantName) { all.filter { it.merchant.name == merchantName } }
     val merchantInfo = coupons.firstOrNull()
@@ -113,10 +107,8 @@ fun CouponScreen(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { isGranted ->
             if (isGranted) {
-                // Permiso concedido, obtener ubicación
                 locationManager.getLastKnownLocation()
             } else {
-                // Permiso denegado
                 Toast.makeText(context, "Permiso de ubicación denegado.", Toast.LENGTH_SHORT).show()
             }
         }
@@ -146,12 +138,8 @@ fun CouponScreen(
                 )
                 IconButton(
                     onClick = {
-                        // 3. Lógica del onClick actualizada
                         if (locationManager.hasLocationPermission()) {
-                            // Si ya tenemos permiso, obtenemos la ubicación más reciente
                             locationManager.getLastKnownLocation()
-
-                            // Procedemos a abrir el mapa (puede que la ubicación sea nula la primera vez)
                             val userLocation = currentLocation
                             val query = if (userLocation != null) {
                                 "$merchantName cerca de ${userLocation.latitude},${userLocation.longitude}"
@@ -159,12 +147,11 @@ fun CouponScreen(
                                 merchantName
                             }
                             val gmmIntentUri = Uri.parse("geo:0,0?q=${Uri.encode(query)}")
-                            val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
-                            mapIntent.setPackage("com.google.android.apps.maps")
+                            val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri).apply {
+                                setPackage("com.google.android.apps.maps")
+                            }
                             context.startActivity(mapIntent)
                         } else {
-                            // Si no tenemos permiso, lo solicitamos.
-                            // La lógica para abrir el mapa se ejecutará en el onResult si es exitoso.
                             permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
                         }
                     },
@@ -178,13 +165,19 @@ fun CouponScreen(
                 }
             }
             if (merchantInfo != null) {
-                Spacer(Modifier.height(12.dp))
-                MerchantHeaderCard(
-                    merchantId = merchantInfo.merchant.id, // <-- PASAR EL ID
-                    name = merchantInfo.merchant.name,
-                    logoUrl = merchantInfo.merchant.logoUrl
-                )
-                Spacer(Modifier.height(16.dp))
+                // AQUÍ ESTÁ EL CAMBIO: Buscamos el ID numérico.
+                val numericMerchantId = merchantIdMap[merchantInfo.merchant.name]?.toString()
+
+                if (numericMerchantId != null) {
+                    Spacer(Modifier.height(12.dp))
+                    MerchantHeaderCard(
+                        merchantId = numericMerchantId, // Y se lo pasamos a la tarjeta.
+                        name = merchantInfo.merchant.name,
+                        logoUrl = merchantInfo.merchant.logoUrl,
+                        subscriptionVM = subscriptionVM
+                    )
+                    Spacer(Modifier.height(16.dp))
+                }
             }
 
             Box(Modifier.weight(1f)) {
@@ -234,27 +227,26 @@ fun CouponScreen(
     }
 }
 
-/**
- * Cabecera fija del comercio actual.
- *
- * @param name Nombre del comercio.
- * @param logoUrl URL del logo (puede ser nulo).
- */
 @Composable
 fun MerchantHeaderCard(
     merchantId: String,
     name: String,
-    logoUrl: String?) {
+    logoUrl: String?,
+    subscriptionVM: SubscriptionViewModel
+) {
     val imageLoader = rememberAppImageLoader()
-    var isSubscribed by remember { mutableStateOf(false) }
-    val subscriptionVM: SubscriptionViewModel = viewModel()
-
+    val isSubscribed by subscriptionVM.isSubscribed.collectAsState()
+    val isLoading by subscriptionVM.loading.collectAsState()
     val error by subscriptionVM.error.collectAsState()
     val context = LocalContext.current
+
+    LaunchedEffect(merchantId) {
+        subscriptionVM.checkInitialSubscription(merchantId)
+    }
+
     LaunchedEffect(error) {
         error?.let {
             Toast.makeText(context, "Error de suscripción: $it", Toast.LENGTH_SHORT).show()
-            isSubscribed = !isSubscribed // Revertir el estado si la llamada falló
             subscriptionVM.clearError()
         }
     }
@@ -274,38 +266,44 @@ fun MerchantHeaderCard(
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .size(50.dp)
-                    .background(
-                        MaterialTheme.colorScheme.onTertiary.copy(alpha = 0.25f), CircleShape)
+                    .background(MaterialTheme.colorScheme.onTertiary.copy(alpha = 0.25f), CircleShape)
                     .padding(4.dp)
             )
             Spacer(Modifier.width(16.dp))
             Column(Modifier.weight(1f)) {
                 Text(
-                    "Cupones de:",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                    text = name,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
-                Text(
-                    name,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.outline
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.Notifications,
+                        contentDescription = "Notificaciones",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(Modifier.width(4.dp))
+                    Text(
+                        text = "Notificaciones",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(
-                    imageVector = Icons.Default.Notifications,
-                    contentDescription = "Suscripción",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+            if (isSubscribed == null || isLoading) {
+                CircularProgressIndicator(modifier = Modifier.size(24.dp))
+            } else {
                 Switch(
-                    checked = isSubscribed,
-                    onCheckedChange = { newSubscriptionState ->
-                        isSubscribed = newSubscriptionState
-                        subscriptionVM.toggleSubscription(merchantId)
-                    },
+                    checked = isSubscribed == true,
+                    onCheckedChange = { subscriptionVM.toggleSubscription(merchantId) },
                     colors = SwitchDefaults.colors(
-                        checkedTrackColor = MaterialTheme.colorScheme.secondary,
-                        checkedThumbColor = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.5f)
+                        checkedThumbColor = MaterialTheme.colorScheme.primary,
+                        checkedTrackColor = MaterialTheme.colorScheme.primaryContainer,
+                        uncheckedThumbColor = MaterialTheme.colorScheme.outline,
+                        uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant,
                     )
                 )
             }
@@ -313,13 +311,6 @@ fun MerchantHeaderCard(
     }
 }
 
-/**
- * Tarjeta visual de un **cupón** con forma de boleto (Ticket).
- *
- * @param coupon Modelo de dominio del cupón.
- * @param isExpanded Controla si se muestra la sección expandida.
- * @param onClick Acción al pulsar la tarjeta (usar para expandir/colapsar).
- */
 @Composable
 fun CouponCard(
     coupon: Coupon,
@@ -430,9 +421,6 @@ fun CouponCard(
     }
 }
 
-/**
- * Divisor vertical punteado usado dentro de la tarjeta tipo ticket.
- */
 @Composable
 fun DottedVerticalDivider() {
     val dividerColor = MaterialTheme.colorScheme.outlineVariant
@@ -450,9 +438,6 @@ fun DottedVerticalDivider() {
     }
 }
 
-/**
- * Divisor horizontal punteado usado en la sección expandible del cupón.
- */
 @Composable
 fun DottedHorizontalDivider() {
     val dividerColor = MaterialTheme.colorScheme.outlineVariant
@@ -470,9 +455,6 @@ fun DottedHorizontalDivider() {
     }
 }
 
-/**
- * Forma personalizada de **boleto (ticket)**.
- */
 class TicketShape(private val cornerRadius: Float, private val notchRadius: Float) : Shape {
     override fun createOutline(size: Size, layoutDirection: LayoutDirection, density: Density): Outline {
         val path = Path().apply {
