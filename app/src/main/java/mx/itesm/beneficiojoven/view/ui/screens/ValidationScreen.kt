@@ -33,13 +33,14 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import mx.itesm.beneficiojoven.view.ui.components.GradientButton
-import mx.itesm.beneficiojoven.view.ui.components.GradientScreenLayout
 import mx.itesm.beneficiojoven.vm.ValidationViewModel
 
 /**
- * Pantalla principal para roles de Merchant y Admin.
+ * Pantalla principal para roles de `Merchant` y `Admin`, diseñada para la validación de cupones.
  *
- * Orquesta el escaneo de códigos QR y muestra el resultado de la validación.
+ * Orquesta el escaneo de códigos QR utilizando el escáner de Google Mobile Services (GMS)
+ * y muestra el resultado de la validación a través de diálogos de alerta. La lógica de
+ * validación es gestionada por el [ValidationViewModel].
  *
  * @param vm El ViewModel que maneja la lógica de validación de cupones.
  */

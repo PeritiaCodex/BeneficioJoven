@@ -31,12 +31,14 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 
 /**
- * Pantalla de **Términos y Condiciones**.
+ * Pantalla que muestra los **Términos y Condiciones** de la aplicación.
  *
- * Muestra un fondo con degradado, encabezado con botón de regreso y un cuerpo de texto
- * desplazable dentro de una tarjeta translúcida. El contenido es estático (placeholder).
+ * Contiene un texto informativo estático dentro de una tarjeta con fondo translúcido,
+ * permitiendo al usuario desplazarse para leer todo el contenido. Incluye un botón
+ * para regresar a la pantalla anterior.
  *
- * @param onBack Acción para cerrar la pantalla y volver a la anterior.
+ * @param onBack Callback que se ejecuta al presionar el botón de regreso,
+ *               generalmente para cerrar esta pantalla.
  */
 @Composable
 fun TermsScreen(

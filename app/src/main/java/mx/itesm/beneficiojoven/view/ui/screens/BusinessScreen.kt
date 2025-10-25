@@ -58,6 +58,8 @@ data class Business(
  *
  * @param vm ViewModel que provee estados de carga, error y la colección de cupones.
  * @param onOpenMerchant Callback para navegar al listado de cupones de un comercio.
+ * @param onOpenFavorites Callback para navegar a la pantalla de favoritos.
+ * @param onOpenProfile Callback para navegar a la pantalla de perfil.
  */
 @Composable
 fun BusinessesScreen(
@@ -186,6 +188,9 @@ fun Header() {
  *
  * @param isExpanded Indica si el panel avanzado está desplegado.
  * @param onToggle Acción para alternar el estado de expansión.
+ * @param topFilters Lista de los 3 filtros más comunes para acceso rápido.
+ * @param activeFilters Conjunto de filtros actualmente seleccionados.
+ * @param onFilterClick Callback para activar/desactivar un filtro.
  */
 @Composable
 fun FilterBar(
@@ -234,6 +239,9 @@ fun FilterBar(
  * Panel avanzado de **filtros** mostrado/oculto mediante animación.
  *
  * @param visible Controla la visibilidad del panel.
+ * @param activeFilters Conjunto de filtros actualmente seleccionados.
+ * @param onFilterClick Callback para activar/desactivar un filtro.
+ * @param onClearFilters Callback para deseleccionar todos los filtros.
  */
 @Composable
 fun ExpandedFiltersPanel(
@@ -300,6 +308,7 @@ fun ExpandedFiltersPanel(
  * @param label Texto del filtro.
  * @param onClick Acción al pulsar el chip.
  * @param modifier Modificador de composición opcional.
+ * @param isSelected Indica si el chip está seleccionado.
  */
 @Composable
 fun FilterChip(
@@ -415,6 +424,8 @@ fun BusinessCard(
 
 /**
  * Menú inferior con accesos rápidos a **Tarjeta**, **Cupones** y **Usuario**.
+ * @param onOpenFavorites Callback para navegar a la pantalla de favoritos.
+ * @param onOpenProfile Callback para navegar a la pantalla de perfil.
  */
 @Composable
 fun BottomMenu(

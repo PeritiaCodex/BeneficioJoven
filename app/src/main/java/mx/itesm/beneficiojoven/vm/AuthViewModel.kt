@@ -17,6 +17,7 @@ import mx.itesm.beneficiojoven.model.data.repository.RemoteRepository // o tu Se
  * Usa un [AppRepository] para comunicarse con la capa de datos (por defecto [RemoteRepository]).
  *
  * @constructor Crea un [AuthViewModel] con el repositorio indicado.
+ * @param repo El repositorio de datos que se utilizará para las operaciones de autenticación.
  * @see AppRepository
  * @see RemoteRepository
  */
@@ -24,20 +25,24 @@ class AuthViewModel(
     private val repo: AppRepository = RemoteRepository()
 ) : ViewModel() {
 
-    /** Usuario autenticado (o `null` si no hay sesión). */
+    /** @property _user Flujo mutable privado que contiene el [User] autenticado o `null`. */
     private val _user = MutableStateFlow<User?>(null)
+    /** @property user Flujo de solo lectura que expone el [User] autenticado o `null` si no hay sesión. */
     val user: StateFlow<User?> = _user
 
-    /** Estado de carga para operaciones de autenticación. */
+    /** @property _loading Flujo mutable privado para el estado de carga. */
     private val _loading = MutableStateFlow(false)
+    /** @property loading Flujo de solo lectura que expone el estado de carga para operaciones de autenticación. */
     val loading: StateFlow<Boolean> = _loading
 
-    /** Mensaje de error de la última operación (o `null` si no hay error). */
+    /** @property _error Flujo mutable privado para los mensajes de error. */
     private val _error = MutableStateFlow<String?>(null)
+    /** @property error Flujo de solo lectura que expone el mensaje de error de la última operación, o `null` si no hay error. */
     val error: StateFlow<String?> = _error
 
-    /** Señal para indicar que el reseteo de contraseña fue exitoso. */
+    /** @property _resetSuccess Flujo mutable privado para la señal de éxito en el reseteo de contraseña. */
     private val _resetSuccess = MutableStateFlow(false)
+    /** @property resetSuccess Flujo de solo lectura que emite `true` cuando el reseteo de contraseña fue exitoso. */
     val resetSuccess: StateFlow<Boolean> = _resetSuccess
 
     /**
@@ -47,8 +52,8 @@ class AuthViewModel(
      * - En éxito, emite el [User] en [user].
      * - En error, emite el mensaje en [error].
      *
-     * @param email Correo electrónico.
-     * @param password Contraseña en texto plano.
+     * @param email Correo electrónico del usuario.
+     * @param password Contraseña en texto plano del usuario.
      */
     fun login(email: String, password: String) = viewModelScope.launch {
         _loading.value = true; _error.value = null
@@ -65,12 +70,12 @@ class AuthViewModel(
      * - En éxito, emite el [User] autenticado en [user].
      * - En error, emite el mensaje en [error].
      *
-     * @param name Nombre completo.
-     * @param email Correo electrónico.
-     * @param password Contraseña en texto plano.
+     * @param name Nombre completo del usuario.
+     * @param email Correo electrónico del usuario.
+     * @param password Contraseña en texto plano para el nuevo usuario.
      * @param curp CURP del usuario.
-     * @param municipality Municipio de residencia.
-     * @param birthDate Fecha de nacimiento con formato `YYYY-MM-DD`. Por defecto `"2000-01-01"`.
+     * @param municipality Municipio de residencia del usuario.
+     * @param birthDate Fecha de nacimiento con formato `YYYY-MM-DD`. Por defecto es `"2000-01-01"`.
      */
     fun register(
         name: String,
@@ -87,6 +92,11 @@ class AuthViewModel(
         _loading.value = false
     }
 
+    /**
+     * Cierra la sesión del usuario actual.
+     *
+     * Limpia el token de sesión en el repositorio y establece el [user] a `null`.
+     */
     fun logout() = viewModelScope.launch {
         repo.logout()
         _user.value = null
@@ -94,6 +104,9 @@ class AuthViewModel(
 
     /**
      * Solicita el envío de un token de restablecimiento de contraseña al correo del usuario.
+     *
+     * Actualiza los estados de [loading] y [error] durante la operación.
+     * En caso de éxito, la UI es responsable de avanzar al siguiente paso del flujo.
      *
      * @param email El correo electrónico para el cual solicitar el restablecimiento.
      */
@@ -111,6 +124,9 @@ class AuthViewModel(
 
     /**
      * Envía el token (código) y la nueva contraseña para completar el restablecimiento.
+     *
+     * Actualiza los estados de [loading] y [error]. En caso de éxito,
+     * emite `true` en el flujo [resetSuccess].
      *
      * @param token El token recibido por el usuario (generalmente por correo).
      * @param newPassword La nueva contraseña a establecer.
@@ -133,6 +149,7 @@ class AuthViewModel(
 
     /**
      * Resetea la bandera de éxito para evitar re-navegaciones o efectos no deseados.
+     * La UI debe llamar a esta función después de haber reaccionado al estado `resetSuccess`.
      */
     fun consumeResetSuccess() {
         _resetSuccess.value = false

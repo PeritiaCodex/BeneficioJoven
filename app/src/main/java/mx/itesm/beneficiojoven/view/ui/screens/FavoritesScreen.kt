@@ -30,8 +30,11 @@ import mx.itesm.beneficiojoven.vm.FavoritesVM
  * obtener la lista completa de cupones y la filtra para mostrar solo los favoritos.
  *
  * @param vm ViewModel que provee el estado de carga y la lista de cupones.
+ * @param favoritesVM ViewModel para gestionar los cupones favoritos.
  * @param onOpenCoupon Callback para navegar al detalle de un cupón.
- * @param onToggleFavorite Callback para cambiar el estado de favorito de un cupón.
+ * @param onBack Acción a ejecutar cuando el usuario decide volver.
+ * @param onOpenFavorites Navega a la pantalla de favoritos.
+ * @param onOpenProfile Navega a la pantalla de perfil.
  */
 @Composable
 fun FavoritesScreen(
@@ -137,6 +140,7 @@ fun FavoritesScreen(
 
 /**
  * Encabezado simple para la pantalla de favoritos.
+ * @param onBack Acción a ejecutar cuando el usuario decide volver.
  */
 @Composable fun FavoritesHeader(
     onBack: () -> Unit

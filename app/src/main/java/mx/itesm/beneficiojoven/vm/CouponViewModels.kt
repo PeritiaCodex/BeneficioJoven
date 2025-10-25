@@ -30,27 +30,34 @@ class CouponListVM(application: Application) : AndroidViewModel(application) {
     /** Repositorio local para la lógica de filtros. */
     private val filterRepo: FilterRepository
 
-    /** Indicador de operación en curso. */
+    /** @property _loading Indicador de operación en curso (privado). */
     private val _loading = MutableStateFlow(true)
+    /** @property loading Flujo de solo lectura que expone el estado de carga. */
     val loading: StateFlow<Boolean> = _loading
 
-    /** Mensaje de error (o `null` si no hay). */
+    /** @property _error Mensaje de error (privado, `null` si no hay). */
     private val _error = MutableStateFlow<String?>(null)
+    /** @property error Flujo de solo lectura que expone el mensaje de error. */
     val error: StateFlow<String?> = _error
 
-    /** Lista observable de cupones para la UI. */
+    /** @property _coupons Lista observable de cupones para la UI (privada). */
     private val _coupons = MutableStateFlow<List<Coupon>>(emptyList())
+    /** @property coupons Flujo de solo lectura que expone la lista de cupones. */
     val coupons: StateFlow<List<Coupon>> = _coupons
 
-    /** Mapa para buscar IDs numéricos de comercios a partir de su nombre. */
+    /** @property _merchantIdMap Mapa para buscar IDs numéricos de comercios a partir de su nombre (privado). */
     private val _merchantIdMap = MutableStateFlow<Map<String, Int>>(emptyMap())
+    /** @property merchantIdMap Flujo de solo lectura que expone el mapa de IDs de comercios. */
     val merchantIdMap: StateFlow<Map<String, Int>> = _merchantIdMap
 
     // --- INICIO: Lógica de Filtros ---
 
+    /** @property _activeFilters Conjunto de filtros de tipo de comercio actualmente activos (privado). */
     private val _activeFilters = MutableStateFlow<Set<String>>(emptySet())
+    /** @property activeFilters Flujo de solo lectura que expone los filtros activos. */
     val activeFilters: StateFlow<Set<String>> = _activeFilters
 
+    /** @property topFilters Flujo que expone los 3 filtros más utilizados por el usuario. */
     val topFilters: StateFlow<List<String>>
 
     init {
@@ -63,6 +70,14 @@ class CouponListVM(application: Application) : AndroidViewModel(application) {
         refresh()
     }
 
+    /**
+     * Activa o desactiva un filtro por tipo de comercio.
+     *
+     * Si el filtro ya está activo, lo elimina. Si no, lo añade al conjunto de filtros
+     * activos y registra el clic para las estadísticas de filtros populares.
+     *
+     * @param type El tipo de comercio a filtrar (ej. "Restaurante").
+     */
     fun toggleFilter(type: String) {
         viewModelScope.launch {
             val current = _activeFilters.value.toMutableSet()
@@ -76,6 +91,9 @@ class CouponListVM(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /**
+     * Limpia todos los filtros activos, mostrando nuevamente todos los cupones.
+     */
     fun clearFilters() {
         _activeFilters.value = emptySet()
     }
@@ -84,6 +102,9 @@ class CouponListVM(application: Application) : AndroidViewModel(application) {
 
     /**
      * Vuelve a solicitar la lista de cupones y de comercios al repositorio.
+     *
+     * Actualiza los flujos de `loading`, `error`, `coupons` y `merchantIdMap`.
+     * Las llamadas de red para cupones y comercios se ejecutan en paralelo.
      */
     fun refresh() = viewModelScope.launch {
         _loading.value = true
@@ -128,8 +149,9 @@ class CouponDetailVM : ViewModel() {
     /** Repositorio compartido obtenido desde el Service Locator. */
     private val repo = ServiceLocator.repo
 
-    /** Cupón actual a mostrar en detalle (o `null`). */
+    /** @property _coupon Cupón actual a mostrar en detalle (privado, o `null`). */
     private val _coupon = MutableStateFlow<Coupon?>(null)
+    /** @property coupon Flujo de solo lectura que expone el cupón cargado. */
     val coupon: StateFlow<Coupon?> = _coupon
 
     /**

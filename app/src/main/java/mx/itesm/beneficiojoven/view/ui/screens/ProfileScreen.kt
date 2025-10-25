@@ -182,6 +182,9 @@ fun ProfileScreen(
 
 /**
  * Barra de navegación inferior con accesos a Tarjeta, Favoritos, Cupones y Perfil.
+ * @param onOpenFavorites Callback para navegar a la pantalla de favoritos.
+ * @param onOpenCoupons Callback para navegar a la pantalla de cupones.
+ * @param onOpenProfile Callback para navegar a la pantalla de perfil.
  */
 @Composable
 private fun BottomMenu(

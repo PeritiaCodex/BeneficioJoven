@@ -30,6 +30,18 @@ import mx.itesm.beneficiojoven.R
 import mx.itesm.beneficiojoven.view.ui.components.GradientButton
 import mx.itesm.beneficiojoven.vm.AuthViewModel
 
+/**
+ * Pantalla de registro de nuevos usuarios.
+ *
+ * Presenta un formulario para que los nuevos usuarios ingresen su información personal,
+ * como CURP, nombre, correo, municipio y contraseña. Gestiona la validación de los campos
+ * y el estado de la operación de registro a través del [AuthViewModel].
+ *
+ * @param vm ViewModel de autenticación que maneja la lógica de registro.
+ * @param onBack Callback para navegar a la pantalla anterior.
+ * @param onRegistered Callback que se ejecuta cuando el registro es exitoso.
+ * @param onTerms Callback para navegar a la pantalla de términos y condiciones.
+ */
 @Composable
 fun RegisterScreen(
     vm: AuthViewModel,
@@ -226,7 +238,7 @@ fun RegisterScreen(
                     }
 
                     if (error != null) {
-                        Spacer(Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
                         Text(error ?: "", color = MaterialTheme.colorScheme.error)
                     }
 

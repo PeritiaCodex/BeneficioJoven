@@ -78,6 +78,21 @@ import mx.itesm.beneficiojoven.vm.CouponListVM
 import mx.itesm.beneficiojoven.vm.FavoritesVM
 import mx.itesm.beneficiojoven.vm.SubscriptionViewModel
 
+/**
+ * Pantalla que muestra los **cupones disponibles** para un comercio específico.
+ *
+ * Despliega una lista de cupones filtrada por el `merchantName` y gestiona la interacción
+ * del usuario, como expandir cupones, marcarlos como favoritos y suscribirse al comercio.
+ * También integra la funcionalidad de geolocalización para buscar el comercio en un mapa.
+ *
+ * @param merchantName Nombre del comercio por el que se filtrará la lista.
+ * @param vm ViewModel que provee la colección completa de cupones y estados de carga/error.
+ * @param favoritesVM ViewModel para gestionar los cupones favoritos.
+ * @param onBack Acción a ejecutar cuando el usuario decide volver.
+ * @param onOpenFavorites Acción para navegar a la pantalla de favoritos.
+ * @param onOpenProfile Acción para navegar al perfil del usuario.
+ * @param subscriptionVM ViewModel para gestionar la suscripción al comercio.
+ */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CouponScreen(
@@ -227,6 +242,14 @@ fun CouponScreen(
     }
 }
 
+/**
+ * Cabecera que muestra la información del comercio y permite la suscripción a notificaciones.
+ *
+ * @param merchantId ID del comercio.
+ * @param name Nombre del comercio.
+ * @param logoUrl URL del logo del comercio.
+ * @param subscriptionVM ViewModel para gestionar la lógica de suscripción.
+ */
 @Composable
 fun MerchantHeaderCard(
     merchantId: String,
@@ -311,6 +334,15 @@ fun MerchantHeaderCard(
     }
 }
 
+/**
+ * Tarjeta visual de un **cupón** con forma de boleto (Ticket).
+ *
+ * @param coupon Modelo de dominio del cupón a mostrar.
+ * @param isExpanded Controla si se muestra la sección expandida con el código QR.
+ * @param isFavorite Indica si el cupón está marcado como favorito por el usuario.
+ * @param onClick Acción que se ejecuta al pulsar la tarjeta para expandir/colapsar.
+ * @param onToggleFavorite Callback para cambiar el estado de favorito del cupón.
+ */
 @Composable
 fun CouponCard(
     coupon: Coupon,
@@ -421,6 +453,9 @@ fun CouponCard(
     }
 }
 
+/**
+ * Divisor vertical punteado, usado para separar visualmente secciones en la `CouponCard`.
+ */
 @Composable
 fun DottedVerticalDivider() {
     val dividerColor = MaterialTheme.colorScheme.outlineVariant
@@ -438,6 +473,9 @@ fun DottedVerticalDivider() {
     }
 }
 
+/**
+ * Divisor horizontal punteado, usado en la sección expandible de la `CouponCard`.
+ */
 @Composable
 fun DottedHorizontalDivider() {
     val dividerColor = MaterialTheme.colorScheme.outlineVariant
@@ -455,6 +493,12 @@ fun DottedHorizontalDivider() {
     }
 }
 
+/**
+ * `Shape` personalizada que crea una forma de boleto con muescas semicirculares en los lados.
+ *
+ * @property cornerRadius Radio de las esquinas redondeadas del boleto.
+ * @property notchRadius Radio de las muescas semicirculares en los lados.
+ */
 class TicketShape(private val cornerRadius: Float, private val notchRadius: Float) : Shape {
     override fun createOutline(size: Size, layoutDirection: LayoutDirection, density: Density): Outline {
         val path = Path().apply {

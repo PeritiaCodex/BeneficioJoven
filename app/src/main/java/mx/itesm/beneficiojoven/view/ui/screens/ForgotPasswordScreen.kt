@@ -30,10 +30,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import mx.itesm.beneficiojoven.R
 import mx.itesm.beneficiojoven.vm.AuthViewModel
 
-// Define los pasos del flujo de recuperación
+/** Enumera los pasos del flujo de recuperación de contraseña. */
 private enum class ForgotStep {
+    /** Paso para ingresar el correo electrónico. */
     EMAIL,
+    /** Paso para ingresar el código de verificación. */
     CODE,
+    /** Paso para establecer la nueva contraseña. */
     PASSWORD
 }
 
@@ -46,6 +49,8 @@ private enum class ForgotStep {
  * 3. Establecer una nueva contraseña.
  *
  * @param onBack Callback para manejar la navegación hacia atrás.
+ * @param onLoginRedirect Callback para redirigir a la pantalla de login tras el éxito.
+ * @param authViewModel ViewModel que gestiona la lógica de autenticación.
  */
 @Composable
 fun ForgotScreen(

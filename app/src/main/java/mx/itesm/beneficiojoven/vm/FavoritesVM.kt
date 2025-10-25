@@ -15,12 +15,14 @@ import mx.itesm.beneficiojoven.model.data.local.DatabaseProvider
 /**
  * ViewModel responsable de exponer y actualizar la lista de cupones **favoritos**.
  *
- * Internamente usa un repositorio local (en memoria) para persistir el estado de favoritos
- * durante la sesión de la app.
+ * Internamente usa un repositorio local para persistir el estado de favoritos
+ * durante la sesión de la app, observando los cambios en la base de datos y
+ * proveyendo métodos para modificar la lista.
  *
- * @constructor Crea un [FavoritesVM] con acceso a un [FavoritesRepository] basado en Room/In-memory.
+ * @param app La instancia de [Application] necesaria para inicializar la base de datos.
+ * @constructor Crea un [FavoritesVM] con acceso a un [FavoritesRepository] basado en Room.
  * @see FavoritesRepository
- * @see InMemoryDbProvider
+ * @see DatabaseProvider
  */
 class FavoritesVM(app: Application) : AndroidViewModel(app) {
 
@@ -30,7 +32,8 @@ class FavoritesVM(app: Application) : AndroidViewModel(app) {
     /**
      * Flujo en vivo de cupones favoritos.
      *
-     * Se inicializa con una lista vacía y se mantiene activo durante todoo el ciclo del ViewModel.
+     * Se inicializa con una lista vacía y se mantiene activo durante todo el ciclo de vida del ViewModel,
+     * emitiendo la lista actualizada de cupones favoritos cada vez que cambia.
      */
     val favorites: StateFlow<List<Coupon>> =
         repo.observe().stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
@@ -38,7 +41,10 @@ class FavoritesVM(app: Application) : AndroidViewModel(app) {
     /**
      * Marca o desmarca un cupón como favorito.
      *
-     * @param coupon Cupón a modificar.
+     * Lanza una corutina para realizar la operación de añadir o remover el cupón
+     * del repositorio de favoritos en segundo plano.
+     *
+     * @param coupon El [Coupon] a modificar.
      * @param nowFavorite `true` para agregar a favoritos, `false` para remover.
      */
     fun toggle(coupon: Coupon, nowFavorite: Boolean) = viewModelScope.launch {
@@ -47,6 +53,9 @@ class FavoritesVM(app: Application) : AndroidViewModel(app) {
 
     /**
      * Expone el repositorio para casos puntuales de UI (por ejemplo, observar `isFavoriteFlow`).
+     *
+     * Permite a los componentes de la UI acceder a flujos específicos del repositorio,
+     * como el estado de favorito de un cupón individual, sin exponer el ViewModel completo.
      *
      * @return Instancia del [FavoritesRepository] subyacente.
      */
