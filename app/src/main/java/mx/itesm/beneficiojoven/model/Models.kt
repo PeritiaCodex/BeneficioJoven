@@ -108,7 +108,7 @@ data class CouponDto(
  *
  * - Usa el **logo del comercio** como `imageUrl`.
  * - Para [Coupon.discountText] prioriza `code`; si está vacío, cae a `discount_type`; si
- *   ambos no están presentes, usa “Descuento”.
+ * ambos no están presentes, usa “Descuento”.
  * - Construye [Merchant] con `merchant_name` como identificador provisional si no hay id real.
  *
  * @receiver [CouponDto] origen a convertir.
@@ -132,6 +132,12 @@ fun CouponDto.toDomain(): Coupon = Coupon(
     qrUrl = qr_code_url
 )
 
+/**
+ * DTO para enviar la solicitud final de reseteo de contraseña.
+ *
+ * @property token El token de un solo uso recibido por email.
+ * @property newPassword La nueva contraseña elegida por el usuario.
+ */
 data class ResetPassword(
     val token: String,
     val newPassword: String

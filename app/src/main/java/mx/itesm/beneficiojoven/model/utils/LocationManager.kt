@@ -19,10 +19,13 @@ import kotlinx.coroutines.flow.StateFlow
  */
 class LocationManager(private val context: Context) {
 
+    /** Cliente de servicios de ubicación de Google Play. */
     private val fusedLocationClient: FusedLocationProviderClient =
         LocationServices.getFusedLocationProviderClient(context)
 
+    /** [MutableStateFlow] interno para la última ubicación conocida. */
     private val _currentLocation = MutableStateFlow<LatLng?>(null)
+    /** [StateFlow] público e inmutable de la ubicación actual ([LatLng] o `null`). */
     val currentLocation: StateFlow<LatLng?> = _currentLocation
 
     /**

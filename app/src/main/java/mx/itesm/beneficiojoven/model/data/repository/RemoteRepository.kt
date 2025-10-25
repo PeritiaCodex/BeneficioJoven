@@ -108,6 +108,9 @@ class RemoteRepository : AppRepository {
         User(id = body.id.toString(), email = email, fullName = name, role = role) // Usamos el ID real
     }
 
+    /**
+     * Cierra la sesión localmente borrando el token y el ID de usuario de [Session].
+     */
     override suspend fun logout() {
         Session.token = null
         Session.userId = null
@@ -136,8 +139,11 @@ class RemoteRepository : AppRepository {
         list.first { it.coupon_id.toString() == id }.toDomain()
     }
 
-    /** Obtiene los datos del perfil del usuario y los mapea al modelo de dominio [User].
-      */
+    /**
+     * Obtiene los datos del perfil del usuario y los mapea al modelo de dominio [User].
+     * @param userId El ID del usuario a consultar.
+     * @return [Result] con el [User] mapeado o un error.
+     */
     override suspend fun getProfile(userId: String) = runCatching {
         val dto = api.getProfile(userId)
         User( id = userId,
@@ -147,10 +153,20 @@ class RemoteRepository : AppRepository {
         )
     }
 
+    /**
+     * Valida un código de cupón contra el backend.
+     * @param code El código (usualmente del QR) a validar.
+     * @return [Result] con el [Coupon] mapeado si es válido, o un error.
+     */
     override suspend fun validateCoupon(code: String) = runCatching {
         api.validate(code).toDomain()
     }
 
+    /**
+     * Solicita un correo de reseteo de contraseña.
+     * @param email El correo del usuario.
+     * @return [Result] con [Unit] en éxito, o un error.
+     */
     override suspend fun requestPasswordReset(email: String) = runCatching {
         val body = mapOf("email" to email)
         val res = api.requestPasswordReset(body)
@@ -163,6 +179,9 @@ class RemoteRepository : AppRepository {
 
     /**
      * Restablece la contraseña usando el token y la nueva clave.
+     * @param token El token recibido por correo.
+     * @param newPassword La nueva contraseña.
+     * @return [Result] con [Unit] en éxito, o un error.
      */
     override suspend fun resetPassword(token: String, newPassword: String) = runCatching {
         val body = ResetPassword(token = token, newPassword = newPassword)
@@ -174,6 +193,11 @@ class RemoteRepository : AppRepository {
         // Devuelve Unit en caso de éxito
     }
 
+    /**
+     * Actualiza el token de FCM (Firebase Cloud Messaging) del usuario en el backend.
+     * @param fcmToken El nuevo token de dispositivo.
+     * @return [Result] con [Unit] en éxito, o un error.
+     */
     override suspend fun updateFcmToken(fcmToken: String) = runCatching {
         val body = mapOf("fcm_token" to fcmToken)
         val res = api.updateFcmToken(body)
@@ -183,6 +207,10 @@ class RemoteRepository : AppRepository {
         }
     }
 
+    /**
+     * Obtiene la lista completa de perfiles de comercios.
+     * @return [Result] con la lista de [MerchantProfileDto] o un error.
+     */
     override suspend fun listMerchants(): Result<List<MerchantProfileDto>> = runCatching {
         val response = api.listMerchants()
         if (!response.isSuccessful) {
@@ -193,6 +221,10 @@ class RemoteRepository : AppRepository {
 
     // --- Implementaciones de Suscripción ---
 
+    /**
+     * Obtiene la lista de IDs de comercios a los que el usuario está suscrito.
+     * @return [Result] con la lista de IDs (Int) o un error.
+     */
     override suspend fun getSubscribedMerchants(): Result<List<Int>> = runCatching {
         val response = api.getSubscribedMerchants()
         if (!response.isSuccessful) {
@@ -201,6 +233,11 @@ class RemoteRepository : AppRepository {
         response.body() ?: emptyList()
     }
 
+    /**
+     * Alterna (suscribe/desuscribe) al usuario de un comercio.
+     * @param merchantId El ID del comercio.
+     * @return [Result] con la respuesta [SubscriptionToggleResponse] o un error.
+     */
     override suspend fun toggleSubscription(merchantId: String): Result<SubscriptionToggleResponse> = runCatching {
         // La llamada a la API ya no necesita un body, solo el ID en la URL.
         val response = api.toggleSubscription(merchantId)

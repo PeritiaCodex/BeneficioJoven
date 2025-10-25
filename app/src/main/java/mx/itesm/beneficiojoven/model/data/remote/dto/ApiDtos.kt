@@ -26,6 +26,9 @@ data class LoginReq(
     val password: String
 )
 
+/**
+ * DTO del perfil de usuario "joven" devuelto por el backend.
+ */
 data class ProfileDto(
     val email: String,
     val full_name: String,
