@@ -7,7 +7,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.google.firebase.messaging.FirebaseMessaging
 import mx.itesm.beneficiojoven.model.Role
-import mx.itesm.beneficiojoven.view.ui.screens.*
+import mx.itesm.beneficiojoven.view.ui.screens.BusinessesScreen
+import mx.itesm.beneficiojoven.view.ui.screens.CouponScreen
+import mx.itesm.beneficiojoven.view.ui.screens.FavoritesScreen
+import mx.itesm.beneficiojoven.view.ui.screens.ForgotScreen
+import mx.itesm.beneficiojoven.view.ui.screens.LoginScreen
+import mx.itesm.beneficiojoven.view.ui.screens.ProfileScreen
+import mx.itesm.beneficiojoven.view.ui.screens.RegisterScreen
+import mx.itesm.beneficiojoven.view.ui.screens.TermsScreen
+import mx.itesm.beneficiojoven.view.ui.screens.ValidationScreen
 import mx.itesm.beneficiojoven.vm.AuthViewModel
 import mx.itesm.beneficiojoven.vm.CouponListVM
 

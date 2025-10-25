@@ -7,10 +7,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import mx.itesm.beneficiojoven.model.data.local.FavoritesRepository
-import mx.itesm.beneficiojoven.model.data.local.InMemoryDbProvider
 import mx.itesm.beneficiojoven.model.Coupon
 import mx.itesm.beneficiojoven.model.data.local.DatabaseProvider
+import mx.itesm.beneficiojoven.model.data.local.FavoritesRepository
 
 /**
  * ViewModel responsable de exponer y actualizar la lista de cupones **favoritos**.

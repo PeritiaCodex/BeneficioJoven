@@ -1,16 +1,16 @@
 package mx.itesm.beneficiojoven.vm
 
 import android.app.Application
+import android.util.Log
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.flow.MutableStateFlow
 import mx.itesm.beneficiojoven.model.User
 import mx.itesm.beneficiojoven.model.data.remote.Session
 import mx.itesm.beneficiojoven.model.di.ServiceLocator
-import android.util.Log
 
 /** DataStore de la aplicación para preferencias simples (scope de la app). */
 private val Application.dataStore by preferencesDataStore("settings")

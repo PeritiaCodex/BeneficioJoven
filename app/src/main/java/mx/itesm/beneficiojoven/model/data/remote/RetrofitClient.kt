@@ -1,6 +1,7 @@
 package mx.itesm.beneficiojoven.model.data.remote
 
 import com.google.gson.GsonBuilder
+import mx.itesm.beneficiojoven.model.data.remote.RetrofitClient.api
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor

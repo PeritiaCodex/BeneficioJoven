@@ -1,7 +1,7 @@
 package mx.itesm.beneficiojoven.view.ui
 
-import android.content.Context
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import coil.ImageLoader
 import coil.decode.SvgDecoder

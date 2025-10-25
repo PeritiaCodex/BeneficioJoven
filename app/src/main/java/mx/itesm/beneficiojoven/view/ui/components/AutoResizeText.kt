@@ -1,6 +1,5 @@
 package mx.itesm.beneficiojoven.view.ui.components
 
-import androidx.compose.animation.core.copy
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue

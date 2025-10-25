@@ -1,5 +1,8 @@
 package mx.itesm.beneficiojoven.view.ui.nav
 
+import mx.itesm.beneficiojoven.view.ui.nav.Screen.CouponDetail.path
+
+
 /**
  * Representa las rutas de navegación de la aplicación usando una clase sellada.
  *

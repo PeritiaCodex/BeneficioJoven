@@ -1,10 +1,19 @@
 package mx.itesm.beneficiojoven.model.data.remote
 
 import mx.itesm.beneficiojoven.model.ResetPassword
-import mx.itesm.beneficiojoven.model.data.remote.dto.*
+import mx.itesm.beneficiojoven.model.data.remote.dto.AuthResponse
+import mx.itesm.beneficiojoven.model.data.remote.dto.CouponDto
+import mx.itesm.beneficiojoven.model.data.remote.dto.LoginReq
+import mx.itesm.beneficiojoven.model.data.remote.dto.MerchantProfileDto
+import mx.itesm.beneficiojoven.model.data.remote.dto.ProfileDto
+import mx.itesm.beneficiojoven.model.data.remote.dto.SubscriptionToggleResponse
 import okhttp3.ResponseBody
-import retrofit2.http.*
 import retrofit2.Response
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.PUT
+import retrofit2.http.Path
 
 /**
  * API de backend de Beneficio Joven.

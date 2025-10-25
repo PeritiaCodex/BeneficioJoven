@@ -2,6 +2,9 @@ package mx.itesm.beneficiojoven.model
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
+import mx.itesm.beneficiojoven.model.Role.ADMIN
+import mx.itesm.beneficiojoven.model.Role.MERCHANT
+import mx.itesm.beneficiojoven.model.Role.USER
 
 /**
  * Modelo de usuario autenticado.

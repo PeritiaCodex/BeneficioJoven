@@ -1,16 +1,16 @@
 package mx.itesm.beneficiojoven.model.data.repository
 
-import mx.itesm.beneficiojoven.model.User
-import mx.itesm.beneficiojoven.model.Role
-import mx.itesm.beneficiojoven.model.data.remote.RetrofitClient
-import mx.itesm.beneficiojoven.model.data.remote.Session
-import mx.itesm.beneficiojoven.model.data.remote.dto.LoginReq
-import mx.itesm.beneficiojoven.model.data.remote.dto.toDomain
 import android.util.Log
 import mx.itesm.beneficiojoven.model.Coupon
 import mx.itesm.beneficiojoven.model.ResetPassword
+import mx.itesm.beneficiojoven.model.Role
+import mx.itesm.beneficiojoven.model.User
+import mx.itesm.beneficiojoven.model.data.remote.RetrofitClient
+import mx.itesm.beneficiojoven.model.data.remote.Session
+import mx.itesm.beneficiojoven.model.data.remote.dto.LoginReq
 import mx.itesm.beneficiojoven.model.data.remote.dto.MerchantProfileDto
 import mx.itesm.beneficiojoven.model.data.remote.dto.SubscriptionToggleResponse
+import mx.itesm.beneficiojoven.model.data.remote.dto.toDomain
 
 /**
  * Implementación remota de [AppRepository] que consume el backend vía Retrofit.
