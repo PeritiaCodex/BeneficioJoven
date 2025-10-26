@@ -163,7 +163,7 @@ fun ForgotScreen(
                     Text(
                         text = "Recuperar contraseña",
                         style = MaterialTheme.typography.headlineSmall,
-                        color = Color.White
+                        color = Color.Black // Cambiado a Color.Black
                     )
                     Spacer(modifier = Modifier.height(24.dp))
 
@@ -187,8 +187,8 @@ fun ForgotScreen(
                                         colors = OutlinedTextFieldDefaults.colors(
                                             focusedBorderColor = MaterialTheme.colorScheme.tertiary,
                                             unfocusedBorderColor = Color.Gray,
-                                            focusedTextColor = Color.White,
-                                            unfocusedTextColor = Color.White,
+                                            focusedTextColor = Color.Black, // Cambiado a Color.Black
+                                            unfocusedTextColor = Color.Black, // Cambiado a Color.Black
                                             focusedLabelColor = MaterialTheme.colorScheme.onTertiary,
                                             unfocusedLabelColor = Color.LightGray,
                                             cursorColor = MaterialTheme.colorScheme.tertiary
@@ -231,8 +231,8 @@ fun ForgotScreen(
                                         colors = OutlinedTextFieldDefaults.colors(
                                             focusedBorderColor = MaterialTheme.colorScheme.tertiary,
                                             unfocusedBorderColor = Color.Gray,
-                                            focusedTextColor = Color.White,
-                                            unfocusedTextColor = Color.White,
+                                            focusedTextColor = Color.Black, // Cambiado a Color.Black
+                                            unfocusedTextColor = Color.Black, // Cambiado a Color.Black
                                             focusedLabelColor = MaterialTheme.colorScheme.onTertiary,
                                             unfocusedLabelColor = Color.LightGray,
                                             cursorColor = MaterialTheme.colorScheme.tertiary
@@ -274,8 +274,8 @@ fun ForgotScreen(
                                         colors = OutlinedTextFieldDefaults.colors(
                                             focusedBorderColor = MaterialTheme.colorScheme.tertiary,
                                             unfocusedBorderColor = Color.Gray,
-                                            focusedTextColor = Color.White,
-                                            unfocusedTextColor = Color.White,
+                                            focusedTextColor = Color.Black, // Cambiado a Color.Black
+                                            unfocusedTextColor = Color.Black, // Cambiado a Color.Black
                                             focusedLabelColor = MaterialTheme.colorScheme.onTertiary,
                                             unfocusedLabelColor = Color.LightGray,
                                             cursorColor = MaterialTheme.colorScheme.tertiary
@@ -293,8 +293,8 @@ fun ForgotScreen(
                                         colors = OutlinedTextFieldDefaults.colors(
                                             focusedBorderColor = MaterialTheme.colorScheme.tertiary,
                                             unfocusedBorderColor = Color.Gray,
-                                            focusedTextColor = Color.White,
-                                            unfocusedTextColor = Color.White,
+                                            focusedTextColor = Color.Black, // Cambiado a Color.Black
+                                            unfocusedTextColor = Color.Black, // Cambiado a Color.Black
                                             focusedLabelColor = MaterialTheme.colorScheme.onTertiary,
                                             unfocusedLabelColor = Color.LightGray,
                                             cursorColor = MaterialTheme.colorScheme.tertiary
